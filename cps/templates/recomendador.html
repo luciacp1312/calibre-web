@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="discover">
+  <h1>Cuestionario</h1>
+  <form role="form" method="POST" action="{{ url_for('handle_questions') }}" autocomplete="off">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    {% for question_id, question_text in questions.items() %}
+    <div class="form-group">
+      <label for="question_{{ question_id }}">{{ question_text }}</label>
+      <input type="number" step="any" class="form-control" name="question_{{ question_id }}" id="question_{{ question_id }}" required>
+    </div>
+    {% endfor %}
+
+    <div class="col-sm-12">
+      <button type="submit" class="btn btn-primary">Enviar</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
