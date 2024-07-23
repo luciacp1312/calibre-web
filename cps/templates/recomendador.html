@@ -1,20 +1,33 @@
 {% extends "layout.html" %}
+{% block title %}{{ instance }} | Recomendador{% endblock %}
 {% block body %}
-<div class="discover">
-  <h1>Cuestionario</h1>
-  <form role="form" method="POST" action="{{ url_for('handle_questions') }}" autocomplete="off">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <h1 class="text-center mb-4">Recomendador</h1>
+      <form role="form" method="POST" action="{{ url_for('handle_questions') }}" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-    {% for question_id, question_text in questions.items() %}
-    <div class="form-group">
-      <label for="question_{{ question_id }}">{{ question_text }}</label>
-      <input type="number" step="any" class="form-control" name="question_{{ question_id }}" id="question_{{ question_id }}" required>
-    </div>
-    {% endfor %}
+        {% for question_id, question_text in questions.items() %}
+        <div class="form-group mb-3">
+          <label for="question_{{ question_id }}">{{ question_text }}</label>
+          <input type="number" step="any" class="form-control" name="question_{{ question_id }}" id="question_{{ question_id }}" required>
+        </div>
+        {% endfor %}
 
-    <div class="col-sm-12">
-      <button type="submit" class="btn btn-primary">Enviar</button>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-lg">Enviar</button>
+        </div>
+      </form>
+
+      <!-- Resultado recomendador -->
+      {% if result %}
+      <div class="result mt-5">
+        <h2 class="text-center"> Libros recomendados: {{ result }}</h2>
+      </div>
+      {% endif %}
+      <!-- Resultado recomendador -->
     </div>
-  </form>
+  </div>
 </div>
 {% endblock %}

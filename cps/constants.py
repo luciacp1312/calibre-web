@@ -119,6 +119,9 @@ sidebar_settings = {
                 "sidebar_archived": SIDEBAR_ARCHIVED,
                 "sidebar_download": SIDEBAR_DOWNLOAD,
                 "sidebar_list": SIDEBAR_LIST,
+#################################### NUEVO recomendador ####################################
+                "sidebar_recommender": SIDEBAR_RECOMMENDER
+#################################### NUEVO recomendador ####################################
             }
 
 

@@ -50,7 +50,7 @@ from . import config_sql
 from io import BytesIO
 from flask import jsonify
 import zipfile
-from .recomendador import pregunta, questions
+from .recomendador import *
 from cps.db import Answer
 ############################### NUEVO ###############################
 
@@ -1264,7 +1264,17 @@ def recomendador():
     if request.method == 'POST':
         return redirect(url_for('handle_questions'))
 
-    return render_template('recomendador.html', questions=questions)
+    return render_template('recomendador.html', questions=questions, instance="Calibre-Web", title="Recomendador")
+    # Con check_visibility
+    '''if current_user.check_visibility(constants.SIDEBAR_RECOMMENDER): ## CON ESTO AHORA NO FUNCIONA
+        if request.method == 'POST':
+            return redirect(url_for('handle_questions'))
+
+        return render_template('recomendador.html', questions=questions, instance="Calibre-Web", title="Recomendador")
+    else:
+            print(f"User visibility check failed: {current_user.check_visibility(constants.SIDEBAR_RECOMMENDER)}")
+            abort(404)'''
+    
 
 @app.route('/handle_questions', methods=['POST'])
 @login_required
@@ -1277,11 +1287,20 @@ def handle_questions():
             answer = request.form.get(f'question_{question_id}')
             if answer:
                 answer = float(answer)
-                new_answer = ub.Answer(user_id=user_id, question_id=question_id, answer=answer)
-                answers.append(new_answer)
+                
+                ########## NUEVO Verificar si hay respuestas guardadas ##########
+                existing_answer = ub.session.query(ub.Answer).filter_by(user_id=user_id, question_id=question_id).first()
+                if existing_answer:
+                    existing_answer.answer = answer # Actualizar la respuesta existente
+                else:
+                    # Crear una nueva respuesta
+                    new_answer = ub.Answer(user_id=user_id, question_id=question_id, answer=answer)
+                    answers.append(new_answer)
+                ########## NUEVO Verificar si hay respuestas guardadas ##########
 
         # Guardar las respuestas en la base de datos
-        ub.session.bulk_save_objects(answers)
+        if answers:
+            ub.session.bulk_save_objects(answers)
         ub.session.commit()
         flash("Respuestas guardadas con éxito.", category="success")
 
@@ -1294,8 +1313,17 @@ def handle_questions():
         ub.session.rollback()
         flash(f"Error operativo de la base de datos: {e}", category="error")
 
-    return redirect(url_for('recomendador'))
-#################################### NUEVO ####################################
+    # Obtener las respuestas guardadas del usuario
+    user_answers = ub.session.query(ub.Answer).filter_by(user_id=user_id).all()
+    
+    # Calcular las probabilidades y determinar el género recomendado
+    questions_so_far = [ans.question_id for ans in user_answers]
+    answers_so_far = [ans.answer for ans in user_answers]
+    probabilities = calculate_probabilities(questions_so_far, answers_so_far)
+    result = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name']
+
+    return render_template('recomendador.html', questions=questions, result=result, instance="Calibre-Web", title="Recomendador")
+#################################### NUEVO recomendador ####################################
 
 #################################### NUEVO ####################################
 @app.route('/download_audio/<int:book_id>')

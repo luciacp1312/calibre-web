@@ -148,6 +148,9 @@
                     <li id="nav_{{element['id']}}" {% if page == element['page'] %}class="active"{% endif %}><a href="{{url_for(element['link'], data=element['page'], sort_param='stored')}}"><span class="glyphicon {{element['glyph']}}"></span> {{_(element['text'])}}</a></li>
                 {% endif %}
               {% endfor %}
+              <!-- Añadir enlace a la página de recomendador -->
+              <li id="nav_recommendador" {% if page == 'recomendador' %}class="active"{% endif %}><a href="{{ url_for('recomendador') }}"><span class="glyphicon glyphicon-star"></span> {{ _('Recomendador') }}</a></li>
+              
               {% if current_user.is_authenticated or g.allow_anonymous %}
                 <li class="nav-head hidden-xs public-shelves">{{_('Shelves')}}</li>
                 {% for shelf in g.shelves_access %}
@@ -158,7 +161,6 @@
                 <li id="nav_about" {% if page == 'stat' %}class="active"{% endif %}><a href="{{url_for('about.stats')}}"><span class="glyphicon glyphicon-info-sign"></span> {{_('About')}}</a></li>
               {% endif %}
               {% endif %}
-
             </ul>
           </nav>
         </div>

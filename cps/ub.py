@@ -175,6 +175,8 @@ class UserBase:
         return self.default_language
 
     def check_visibility(self, value):
+        #print(f"User sidebar_view: {self.sidebar_view}")
+        #print(f"SIDEBAR_RECOMMENDER: {constants.SIDEBAR_RECOMMENDER}") # Comprobar constante de Recomendador
         if value == constants.SIDEBAR_RECENT:
             return True
         return constants.has_flag(self.sidebar_view, value)
@@ -250,6 +252,7 @@ class User(UserBase, Base):
     answers = relationship('Answer', back_populates='user')
     #################################### NUEVO recomendador ####################################
     
+#################################### NUEVO recomendador ####################################
 class Answer(Base):
     __tablename__ = 'answers'
     
@@ -711,7 +714,7 @@ def migrate_Database(_session):
     try:
         create = False
         _session.query(exists().where(User.sidebar_view)).scalar()
-    except exc.OperationalError:  # Database is not compatible, some columns are missing
+    except exc.OperationalError:
         with engine.connect() as conn:
             trans = conn.begin()
             conn.execute(text("ALTER TABLE user ADD column `sidebar_view` Integer DEFAULT 1"))
@@ -726,17 +729,22 @@ def migrate_Database(_session):
     except exc.OperationalError:
         with engine.connect() as conn:
             trans = conn.begin()
-            conn.execute(text("UPDATE user SET 'sidebar_view' = (random_books* :side_random + language_books * :side_lang "
-                     "+ series_books * :side_series + category_books * :side_category + hot_books * "
-                     ":side_hot + :side_autor + :detail_random)"),
-                     {'side_random': constants.SIDEBAR_RANDOM, 'side_lang': constants.SIDEBAR_LANGUAGE,
-                      'side_series': constants.SIDEBAR_SERIES, 'side_category': constants.SIDEBAR_CATEGORY,
-                      'side_hot': constants.SIDEBAR_HOT, 'side_autor': constants.SIDEBAR_AUTHOR,
-                      'detail_random': constants.DETAIL_RANDOM})
+            conn.execute(text("UPDATE user SET sidebar_view = (random_books * :side_random + "
+                              "language_books * :side_lang + series_books * :side_series + "
+                              "category_books * :side_category + hot_books * :side_hot + "
+                              ":side_autor + detail_random + :side_recommender)"),
+                         {'side_random': constants.SIDEBAR_RANDOM,
+                          'side_lang': constants.SIDEBAR_LANGUAGE,
+                          'side_series': constants.SIDEBAR_SERIES,
+                          'side_category': constants.SIDEBAR_CATEGORY,
+                          'side_hot': constants.SIDEBAR_HOT,
+                          'side_autor': constants.SIDEBAR_AUTHOR,
+                          'detail_random': constants.DETAIL_RANDOM,
+                          'side_recommender': constants.SIDEBAR_RECOMMENDER})
             trans.commit()
     try:
         _session.query(exists().where(User.denied_tags)).scalar()
-    except exc.OperationalError:  # Database is not compatible, some columns are missing
+    except exc.OperationalError:
         with engine.connect() as conn:
             trans = conn.begin()
             conn.execute(text("ALTER TABLE user ADD column `denied_tags` String DEFAULT ''"))
@@ -759,36 +767,33 @@ def migrate_Database(_session):
             conn.execute(text("ALTER TABLE user ADD column `kobo_only_shelves_sync` SMALLINT DEFAULT 0"))
             trans.commit()
     try:
-        # check if name is in User table instead of nickname
         _session.query(exists().where(User.name)).scalar()
     except exc.OperationalError:
-        # Create new table user_id and copy contents of table user into it
         with engine.connect() as conn:
             trans = conn.begin()
             conn.execute(text("CREATE TABLE user_id (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                     "name VARCHAR(64),"
-                     "email VARCHAR(120),"
-                     "role SMALLINT,"
-                     "password VARCHAR,"
-                     "kindle_mail VARCHAR(120),"
-                     "locale VARCHAR(2),"
-                     "sidebar_view INTEGER,"
-                     "default_language VARCHAR(3),"                     
-                     "denied_tags VARCHAR,"
-                     "allowed_tags VARCHAR,"
-                     "denied_column_value VARCHAR,"
-                     "allowed_column_value VARCHAR,"
-                     "view_settings JSON,"
-                     "kobo_only_shelves_sync SMALLINT,"                              
-                     "UNIQUE (name),"
-                     "UNIQUE (email))"))
+                             "name VARCHAR(64),"
+                             "email VARCHAR(120),"
+                             "role SMALLINT,"
+                             "password VARCHAR,"
+                             "kindle_mail VARCHAR(120),"
+                             "locale VARCHAR(2),"
+                             "sidebar_view INTEGER,"
+                             "default_language VARCHAR(3),"                     
+                             "denied_tags VARCHAR,"
+                             "allowed_tags VARCHAR,"
+                             "denied_column_value VARCHAR,"
+                             "allowed_column_value VARCHAR,"
+                             "view_settings JSON,"
+                             "kobo_only_shelves_sync SMALLINT,"
+                             "UNIQUE (name),"
+                             "UNIQUE (email))"))
             conn.execute(text("INSERT INTO user_id(id, name, email, role, password, kindle_mail,locale,"
-                     "sidebar_view, default_language, denied_tags, allowed_tags, denied_column_value, "
-                     "allowed_column_value, view_settings, kobo_only_shelves_sync)"
-                     "SELECT id, nickname, email, role, password, kindle_mail, locale,"
-                     "sidebar_view, default_language, denied_tags, allowed_tags, denied_column_value, "
-                     "allowed_column_value, view_settings, kobo_only_shelves_sync FROM user"))
-            # delete old user table and rename new user_id table to user:
+                              "sidebar_view, default_language, denied_tags, allowed_tags, denied_column_value, "
+                              "allowed_column_value, view_settings, kobo_only_shelves_sync)"
+                              "SELECT id, nickname, email, role, password, kindle_mail, locale,"
+                              "sidebar_view, default_language, denied_tags, allowed_tags, denied_column_value, "
+                              "allowed_column_value, view_settings, kobo_only_shelves_sync FROM user"))
             conn.execute(text("DROP TABLE user"))
             conn.execute(text("ALTER TABLE user_id RENAME TO user"))
             trans.commit()
@@ -797,6 +802,7 @@ def migrate_Database(_session):
         create_anonymous_user(_session)
 
     migrate_guest_password(engine)
+
 
 
 def clean_database(_session):
