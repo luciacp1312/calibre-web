@@ -4,14 +4,24 @@
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-8 offset-md-2">
-      <h1 class="text-center mb-4">Recomendador</h1>
+      <h1 class="text-center mb-4" style="margin-bottom: 40px;">Recomendador</h1>
+
+      <!-- Mostrar el formulario solo si no hay resultados -->
+      {% if not result %}
       <form role="form" method="POST" action="{{ url_for('handle_questions') }}" autocomplete="off">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        {% for question_id, question_text in questions.items() %}
+        {% for question_id, question in questions.items() %}
         <div class="form-group mb-3">
-          <label for="question_{{ question_id }}">{{ question_text }}</label>
-          <input type="number" step="any" class="form-control" name="question_{{ question_id }}" id="question_{{ question_id }}" required>
+          <label>{{ question['text'] }}</label>
+          <div>
+            {% for idx, option in question['options'].items() %}
+            <div class="form-check form-check-inline">
+              <input type="radio" class="form-check-input" name="question_{{ question_id }}" id="question_{{ question_id }}_{{ idx }}" value="{{ idx }}" required>
+              <label class="form-check-label" for="question_{{ question_id }}_{{ idx }}">{{ option }}</label>
+            </div>
+            {% endfor %}
+          </div>
         </div>
         {% endfor %}
 
@@ -19,14 +29,17 @@
           <button type="submit" class="btn btn-primary btn-lg">Enviar</button>
         </div>
       </form>
-
+      {% else %}
       <!-- Resultado recomendador -->
-      {% if result %}
       <div class="result mt-5">
-        <h2 class="text-center"> Libros recomendados: {{ result }}</h2>
+        <h2 class="text-center">Te recomendamos los siguientes libros: {{ result }}</h2>
+        <div class="text-center mt-4">
+          <a href="{{ url_for('recomendador') }}" class="btn btn-secondary btn-lg">Volver al cuestionario</a>
+        </div>
       </div>
+      <!-- Fin del resultado recomendador -->
       {% endif %}
-      <!-- Resultado recomendador -->
+
     </div>
   </div>
 </div>
