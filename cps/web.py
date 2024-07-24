@@ -1260,7 +1260,7 @@ def download_link(book_id, book_format, anyname):
     return get_download_link(book_id, book_format, client)
 
 #################################### NUEVO recomendador ####################################
-def render_recomendador(page, book_id=None, order=['default', 'order']):
+def render_recomendador(page, book_id=None, order=['default', 'order'], result=None):
     #if current_user.check_visibility(constants.SIDEBAR_RECOMMENDER):
     if order is None:
         order = ['default', 'order']
@@ -1268,6 +1268,7 @@ def render_recomendador(page, book_id=None, order=['default', 'order']):
     return render_title_template(
         'recomendador.html',
         questions=questions,
+        result=result,
         title=_("Recomendador"),
         page="recomendador",
         order=order[1],
@@ -1281,7 +1282,23 @@ def render_recomendador(page, book_id=None, order=['default', 'order']):
 def recomendador():
     if request.method == 'POST':
         return redirect(url_for('handle_questions'))
-    return render_recomendador(page=1, book_id=None, order=['default', 'order'])
+    
+    # Si reset está a True, borrar las respuestas y la recomendación
+    if request.args.get('reset'):
+        user_id = current_user.id
+        ub.session.query(ub.Answer).filter_by(user_id=user_id).delete()
+        ub.session.query(ub.Recommendation).filter_by(user_id=user_id).delete()
+        ub.session.commit()
+        return render_recomendador(page=1, book_id=None, order=['default', 'order'])
+        
+    else:
+        user_id = current_user.id
+        recommendation = ub.session.query(ub.Recommendation).filter_by(user_id=user_id).first()
+
+        if recommendation:
+            return render_recomendador(page=1, book_id=None, order=['default', 'order'], result=recommendation.result)
+        
+        return render_recomendador(page=1, book_id=None, order=['default', 'order'])
         
 
 @app.route('/handle_questions', methods=['POST'])
@@ -1330,6 +1347,17 @@ def handle_questions():
     probabilities = calculate_probabilities(questions_so_far, answers_so_far)
     result = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name']
 
+    ########## NUEVO Guardar recomendación ##########
+    existing_recommendation = ub.session.query(ub.Recommendation).filter_by(user_id=user_id).first()
+    if existing_recommendation:
+        existing_recommendation.result = result
+    else:
+        new_recommendation = ub.Recommendation(user_id=user_id, result=result)
+        ub.session.add(new_recommendation)
+        
+    ub.session.commit()
+    ########## NUEVO Guardar recomendación ##########
+    
     return render_title_template(
         'recomendador.html',
         questions=questions,

@@ -6,7 +6,6 @@
     <div class="col-md-8 offset-md-2">
       <h1 class="text-center mb-4" style="margin-bottom: 40px;">Recomendador</h1>
 
-      <!-- Mostrar el formulario solo si no hay resultados -->
       {% if not result %}
       <form role="form" method="POST" action="{{ url_for('handle_questions') }}" autocomplete="off">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -30,16 +29,13 @@
         </div>
       </form>
       {% else %}
-      <!-- Resultado recomendador -->
       <div class="result mt-5">
         <h2 class="text-center">Te recomendamos los siguientes libros: {{ result }}</h2>
         <div class="text-center mt-4">
-          <a href="{{ url_for('recomendador') }}" class="btn btn-secondary btn-lg">Volver al cuestionario</a>
+          <a href="{{ url_for('recomendador', reset=True) }}" class="btn btn-secondary btn-lg">Volver al cuestionario</a>
         </div>
       </div>
-      <!-- Fin del resultado recomendador -->
       {% endif %}
-
     </div>
   </div>
 </div>

@@ -270,6 +270,25 @@ class Answer(Base):
 
     def __repr__(self):
         return f"<Answer(question_id='{self.question_id}', user_id='{self.user_id}', answer='{self.answer}')>"
+
+class Recommendation(Base):
+    __tablename__ = 'recommendations'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    result = Column(String, nullable=False)
+    user = relationship("User", back_populates='recommendations')
+    
+    def __init__(self, user_id, result):
+        super().__init__()
+        self.user_id = user_id
+        self.result = result
+        
+    def __repr__(self):
+        return f"<Recommendation(user_id='{self.user_id}', result='{self.result}')>"
+
+User.recommendations = relationship('Recommendation', back_populates='user')
+
 #################################### NUEVO recomendador ####################################
 
 
