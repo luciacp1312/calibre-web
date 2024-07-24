@@ -424,6 +424,8 @@ def render_books_list(data, sort_param, book_id, page):
         term = json.loads(flask_session.get('query', '{}'))
         offset = int(int(config.config_books_per_page) * (page - 1))
         return render_adv_search_results(term, offset, order, config.config_books_per_page)
+    elif data == "recomendador":
+        return render_recomendador(page, book_id, order)
     else:
         website = data or "newest"
         entries, random, pagination = calibre_db.fill_indexpage(page, 0, db.Books, True, order[0],
@@ -1258,23 +1260,29 @@ def download_link(book_id, book_format, anyname):
     return get_download_link(book_id, book_format, client)
 
 #################################### NUEVO recomendador ####################################
+def render_recomendador(page, book_id=None, order=['default', 'order']):
+    #if current_user.check_visibility(constants.SIDEBAR_RECOMMENDER):
+    if order is None:
+        order = ['default', 'order']
+        
+    return render_title_template(
+        'recomendador.html',
+        questions=questions,
+        title=_("Recomendador"),
+        page="recomendador",
+        order=order[1],
+        #instance="Calibre-Web"
+    )
+    #else:
+        #abort(404)
+
 @app.route('/recomendador', methods=['GET', 'POST'])
 @login_required
 def recomendador():
     if request.method == 'POST':
         return redirect(url_for('handle_questions'))
-
-    return render_template('recomendador.html', questions=questions, instance="Calibre-Web", title="Recomendador")
-    # Con check_visibility
-    '''if current_user.check_visibility(constants.SIDEBAR_RECOMMENDER): ## CON ESTO AHORA NO FUNCIONA
-        if request.method == 'POST':
-            return redirect(url_for('handle_questions'))
-
-        return render_template('recomendador.html', questions=questions, instance="Calibre-Web", title="Recomendador")
-    else:
-            print(f"User visibility check failed: {current_user.check_visibility(constants.SIDEBAR_RECOMMENDER)}")
-            abort(404)'''
-    
+    return render_recomendador(page=1, book_id=None, order=['default', 'order'])
+        
 
 @app.route('/handle_questions', methods=['POST'])
 @login_required
@@ -1322,7 +1330,13 @@ def handle_questions():
     probabilities = calculate_probabilities(questions_so_far, answers_so_far)
     result = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name']
 
-    return render_template('recomendador.html', questions=questions, result=result, instance="Calibre-Web", title="Recomendador")
+    return render_title_template(
+        'recomendador.html',
+        questions=questions,
+        result=result,
+        title="Recomendador",
+        #instance="Calibre-Web"
+    )
 #################################### NUEVO recomendador ####################################
 
 #################################### NUEVO ####################################

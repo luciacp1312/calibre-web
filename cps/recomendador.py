@@ -80,21 +80,3 @@ def pregunta(question, answer):
     else:
         next_question = random.choice(questions_left)
         return next_question, questions[next_question], None
-
-'''# Ruta del recomendador
-@app.route('/recomendador', methods=['GET', 'POST'])
-def recomendador():
-    global questions_so_far, answers_so_far
-
-    if request.method == 'POST':
-        question = request.form.get('question')
-        answer = request.form.get('answer')
-        next_question, question_text, result = pregunta(question, answer)
-        if result:
-            questions_so_far = []
-            answers_so_far = []
-            return render_template('recomendador.html', result=result)
-        else:
-            return render_template('recomendador.html', question=next_question, question_text=question_text)
-    return render_template('recomendador.html', question=1, question_text=questions[1])
-'''

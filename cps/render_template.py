@@ -101,8 +101,9 @@ def get_sidebar_config(kwargs=None):
             {"glyph": "glyphicon-th-list", "text": _('Books List'), "link": 'web.books_table', "id": "list",
              "visibility": constants.SIDEBAR_LIST, 'public': (not current_user.is_anonymous), "page": "list",
              "show_text": _('Show Books List'), "config_show": content})
-    
     #################################### NUEVO recomendador ####################################
+    #print(f"Visibilidad del recomendador: {current_user.check_visibility(constants.SIDEBAR_RECOMMENDER)}")
+    #print("Sidebar Configuración:", sidebar)
     sidebar.append(
         {"glyph": "glyphicon-thumbs-up", "text": _('Recomendador'), "link": 'web.recomendador', "id": "recomendador",
          "visibility": constants.SIDEBAR_RECOMMENDER, 'public': True, "page": "recomendador",
@@ -119,11 +120,6 @@ def get_sidebar_config(kwargs=None):
 # Returns the template for rendering and includes the instance name
 def render_title_template(*args, **kwargs):
     sidebar, simple = get_sidebar_config(kwargs)
-    #################################### NUEVO recomendador DEBUG ####################################
-    '''log.debug(f"Sidebar: {sidebar}")
-    log.debug(f"Simple: {simple}")
-    log.debug(f"Accept: {config.config_upload_formats.split(',')}")'''
-    #################################### NUEVO recomendador DEBUG ####################################
 
     try:
         return render_template(instance=config.config_calibre_web_title, sidebar=sidebar, simple=simple,
