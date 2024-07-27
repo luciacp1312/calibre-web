@@ -844,19 +844,6 @@ def update_download(book_id, user_id):
         except exc.OperationalError:
             session.rollback()
 
-#################################### NUEVO ####################################
-def update_download_audio(book_id, user_id):
-    check = session.query(Downloads).filter(Downloads.user_id == user_id).filter(Downloads.book_id == book_id).first()
-
-    if not check:
-        new_download = Downloads(user_id=user_id, book_id=book_id)
-        session.add(new_download)
-        try:
-            session.commit()
-        except exc.OperationalError:
-            session.rollback()
-#################################### NUEVO ####################################
-
 
 # Delete non existing downloaded books in calibre-web's own database
 def delete_download(book_id):

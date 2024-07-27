@@ -1,42 +1,42 @@
 {% extends "layout.html" %}
-{% block title %}{{ instance }} | Recomendador{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 {% block body %}
 <div class="container mt-5">
-  <div class="row">
-    <div class="col-md-8 offset-md-2">
-      <h1 class="text-center mb-4" style="margin-bottom: 40px;">Recomendador</h1>
-
-      {% if not result %}
-      <form role="form" method="POST" action="{{ url_for('handle_questions') }}" autocomplete="off">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-        {% for question_id, question in questions.items() %}
-        <div class="form-group mb-3">
-          <label>{{ question['text'] }}</label>
-          <div>
-            {% for idx, option in question['options'].items() %}
-            <div class="form-check form-check-inline">
-              <input type="radio" class="form-check-input" name="question_{{ question_id }}" id="question_{{ question_id }}_{{ idx }}" value="{{ idx }}" required>
-              <label class="form-check-label" for="question_{{ question_id }}_{{ idx }}">{{ option }}</label>
-            </div>
-            {% endfor %}
-          </div>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="text-center mb-4">Recomendador</h1>
+            {% if not result %}
+                <form method="POST" action="{{ url_for('recomendaciones') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% for question_id, question in questions.items() %}
+                        <div class="form-group">
+                            <label>{{ question['text'] }}</label>
+                            {% for idx, option in question['options'].items() %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="question_{{ question_id }}" value="{{ idx }}" required>
+                                    <label class="form-check-label">{{ option }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+            {% else %}
+                <h2>Te recomendamos los siguientes libros:</h2>
+                <ul>
+                    {% for book in result %}
+                        <li>
+                            <h3>{{ book.title }}</h3>
+                            <p>Autor: {{ book.author }}</p>
+                            <p>Descripción: {{ book.description }}</p>
+                            <p>Publicado en: {{ book.publishedDate }}</p>
+                            <img src="{{ book.thumbnail }}" alt="{{ book.title }}">
+                        </li>
+                    {% endfor %}
+                </ul>
+                <a href="{{ url_for('recomendador', reset=True) }}" class="btn btn-secondary">Volver al cuestionario</a>
+            {% endif %}
         </div>
-        {% endfor %}
-
-        <div class="text-center">
-          <button type="submit" class="btn btn-primary btn-lg">Enviar</button>
-        </div>
-      </form>
-      {% else %}
-      <div class="result mt-5">
-        <h2 class="text-center">Te recomendamos los siguientes libros: {{ result }}</h2>
-        <div class="text-center mt-4">
-          <a href="{{ url_for('recomendador', reset=True) }}" class="btn btn-secondary btn-lg">Volver al cuestionario</a>
-        </div>
-      </div>
-      {% endif %}
     </div>
-  </div>
 </div>
 {% endblock %}

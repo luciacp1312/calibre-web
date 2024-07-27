@@ -1281,7 +1281,7 @@ def render_recomendador(page, book_id=None, order=['default', 'order'], result=N
 @login_required
 def recomendador():
     if request.method == 'POST':
-        return redirect(url_for('handle_questions'))
+        return redirect(url_for('recomendaciones'))
     
     # Si reset está a True, borrar las respuestas y la recomendación
     if request.args.get('reset'):
@@ -1301,9 +1301,9 @@ def recomendador():
         return render_recomendador(page=1, book_id=None, order=['default', 'order'])
         
 
-@app.route('/handle_questions', methods=['POST'])
+@app.route('/recomendaciones', methods=['POST'])
 @login_required
-def handle_questions():
+def recomendaciones():
     user_id = current_user.id
     answers = []
 
@@ -1313,7 +1313,7 @@ def handle_questions():
             if answer:
                 answer = float(answer)
                 
-                ########## NUEVO Verificar si hay respuestas guardadas ##########
+                # Verificar si hay respuestas guardadas
                 existing_answer = ub.session.query(ub.Answer).filter_by(user_id=user_id, question_id=question_id).first()
                 if existing_answer:
                     existing_answer.answer = answer # Actualizar la respuesta existente
@@ -1321,8 +1321,7 @@ def handle_questions():
                     # Crear una nueva respuesta
                     new_answer = ub.Answer(user_id=user_id, question_id=question_id, answer=answer)
                     answers.append(new_answer)
-                ########## NUEVO Verificar si hay respuestas guardadas ##########
-
+                
         # Guardar las respuestas en la base de datos
         if answers:
             ub.session.bulk_save_objects(answers)
@@ -1340,34 +1339,111 @@ def handle_questions():
 
     # Obtener las respuestas guardadas del usuario
     user_answers = ub.session.query(ub.Answer).filter_by(user_id=user_id).all()
+    print(f"DEBUG: Respuestas del usuario: {user_answers}")  # DEBUG
     
     # Calcular las probabilidades y determinar el género recomendado
     questions_so_far = [ans.question_id for ans in user_answers]
     answers_so_far = [ans.answer for ans in user_answers]
     probabilities = calculate_probabilities(questions_so_far, answers_so_far)
-    result = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name']
-
-    ########## NUEVO Guardar recomendación ##########
+    result_name = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name']
+    recommended_books_names = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name'].split(', ')
+    
+    result = []
+    for book_name in recommended_books_names:
+        print(f"DEBUG: Obteniendo información del libro: {book_name}")  # DEBUG
+        book_info = get_book_info(title=book_name)
+        if book_info:
+            result.append({
+                #'id': book_info.id,
+                'title': book_info['title'],
+                'author': book_info['author'],
+                'description': book_info['description'],
+                'publisher': book_info['publication_info'],
+                'publishedDate': book_info['publication_info'],
+                'pageCount': book_info['page_count'],
+                'language': book_info['language'],
+                'thumbnail': book_info['thumbnail']
+            })
+    
+    '''# Guardar recomendación
+    print("DEBUG: Guardando recomendación")  # DEBUG
     existing_recommendation = ub.session.query(ub.Recommendation).filter_by(user_id=user_id).first()
     if existing_recommendation:
+        #existing_recommendation.result = recommended_books_names
         existing_recommendation.result = result
     else:
         new_recommendation = ub.Recommendation(user_id=user_id, result=result)
         ub.session.add(new_recommendation)
+    print("DEBUG: Recomendación guardada")  # DEBUG
         
     ub.session.commit()
-    ########## NUEVO Guardar recomendación ##########
+    print(f"Book Recommendations: {result}") # DEBUG
+    # Guardar recomendación'''
     
     return render_title_template(
+        'detail_recomendador.html',
+        result=result,
+        title="Recomendador")
+    '''return render_title_template(
         'recomendador.html',
         questions=questions,
         result=result,
-        title="Recomendador",
-        #instance="Calibre-Web"
-    )
+        title="Recomendador"
+    )'''
+    
 #################################### NUEVO recomendador ####################################
 
-#################################### NUEVO ####################################
+#################################### NUEVO buscar libro recomendador  ####################################
+import requests
+
+def get_book_info(isbn=None, title=None):
+    base_url = 'https://www.googleapis.com/books/v1/volumes'
+    params = {}
+
+    if isbn:
+        params['q'] = f'isbn:{isbn}'
+    elif title:
+        params['q'] = f'title:{title}'
+    else:
+        raise ValueError("Either ISBN or title must be provided.")
+
+    # Realizar la búsqueda
+    params['key'] = 'AIzaSyACIkFe67iKjQSMS01E3BPiftD9AAs8QAU'
+    
+    response = requests.get(base_url, params=params)
+    response.raise_for_status()
+    data = response.json()
+
+    # Buscar el primer resultado en la respuesta
+    items = data.get('items')
+    if not items:
+        return None
+    
+    
+    book = items[0]['volumeInfo']
+    title = book.get('title', 'Unknown')
+    author = ', '.join(book.get('authors', ['Unknown']))
+    publication_info = book.get('publishedDate', 'Unknown')
+    description = book.get('description', 'No description available.')
+    page_count = book.get('pageCount', 'Unknown')
+    language = book.get('language', 'Unknown')
+    thumbnail = book.get('imageLinks', {}).get('thumbnail', 'No image available.')
+
+    book_info = {
+        'title': title,
+        'author': author,
+        'publication_info': publication_info,
+        'description': description,
+        'page_count': page_count,
+        'language': language,
+        'thumbnail': thumbnail
+    }
+
+    print(f"DEBUG: Información del libro: {book_info}")  # DEBUG
+    return book_info
+#################################### NUEVO buscar libro recomendador ####################################
+
+#################################### NUEVO audio ####################################
 @app.route('/download_audio/<int:book_id>')
 @login_required
 def download_audio(book_id):
@@ -1382,16 +1458,20 @@ def download_audio(book_id):
         return "Permission denied", 403
 
     # Obtener todas las instancias de Data asociadas a ese libro específico
-    #data_for_book = book.data
+    #book = ub.session.query(ub.Downloads).filter(ub.Downloads.user_id == int(current_user.id)).filter(ub.Downloads.book_id == book_id).first()
+    #book = calibre_db.session.query(ub.Downloads).filter(ub.Downloads.book_id == book_id).first()
+    
     data = calibre_db.get_book_format(book_id, 'EPUB')
-    data = bytes(data)
     # Verificar si hay instancias de Data asociadas al libro
     if not data:
         return "No data found for the book", 404
 
-    #book_content =  serve_book(book_id, 'epub', 'file.epub').get_data(as_text=True)
+
     # Extraer el contenido del EPUB
+    # Convertir data a bytes si es necesario
     epub_file = BytesIO(data)
+        
+    #epub_file = BytesIO(data)
     book_content = ""
     with zipfile.ZipFile(epub_file, 'r') as z:
         for filename in z.namelist():
@@ -1414,7 +1494,7 @@ def download_audio(book_id):
         download_name=f"{book.title}.mp3",
         mimetype="audio/mpeg"
     )
-#################################### NUEVO ####################################
+#################################### NUEVO audio ####################################
 
 #################################### NUEVO (guardar audio en base de datos, ahora no funciona) ####################################
 @web.route("/download_audio/<int:book_id>", defaults={'anyname': 'None'})

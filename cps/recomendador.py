@@ -97,16 +97,16 @@ questions = {
 
 
 books = [
-    {'name': 'Dune, Neuromante y Fundación', 'answers': {1: 1, 2: 1, 3: 1, 4: 1, 5: 3, 6: 1, 7: 1, 8: 1, 9: 3, 10: 2}},
-    {'name': 'Orgullo y prejuicio, Bajo la misma estrella y Cometas en el cielo', 'answers': {1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 2, 7: 4, 8: 2, 9: 2, 10: 1}},
-    {'name': 'Harry Potter, El nombre del viento y El asesinato de Roger Ackroyd', 'answers': {1: 3, 2: 3, 3: 1, 4: 3, 5: 4, 6: 1, 7: 3, 8: 3, 9: 3, 10: 3}},
-    {'name': 'La chica del tren, El código Da Vinci y Perdida', 'answers': {1: 4, 2: 1, 3: 3, 4: 4, 5: 3, 6: 2, 7: 3, 8: 2, 9: 2, 10: 3}},
-    {'name': 'Cien años de soledad, Crimen y castigo y Matar a un ruiseñor', 'answers': {1: 2, 2: 2, 3: 2, 4: 2, 5: 4, 6: 2, 7: 2, 8: 2, 9: 3, 10: 2}},
-    {'name': 'Maus, Watchmen y Sandman', 'answers': {1: 4, 2: 1, 3: 4, 4: 4, 5: 2, 6: 2, 7: 1, 8: 2, 9: 1, 10: 4}},
-    {'name': 'El señor de los anillos, Juego de tronos y La rueda del tiempo', 'answers': {1: 3, 2: 3, 3: 1, 4: 3, 5: 3, 6: 1, 7: 2, 8: 1, 9: 3, 10: 2}},
-    {'name': 'Sapiens, El diario de Ana Frank y El hombre en busca de sentido', 'answers': {1: 2, 2: 2, 3: 2, 4: 2, 5: 4, 6: 1, 7: 3, 8: 2, 9: 2, 10: 2}},
-    {'name': 'Normal People, La casa de los espíritus y La sombra del viento', 'answers': {1: 2, 2: 2, 3: 2, 4: 2, 5: 4, 6: 2, 7: 2, 8: 2, 9: 2, 10: 3}},
-    {'name': '1984, El cuento de la criada y Un mundo feliz', 'answers': {1: 1, 2: 1, 3: 1, 4: 1, 5: 4, 6: 2, 7: 3, 8: 2, 9: 2, 10: 3}},
+    {'name': 'Dune 1 Frank Herbert, El marciano Andy Weir, Fundación 1: Fundación Isaac Asimov', 'answers': {1: 1, 2: 1, 3: 1, 4: 1, 5: 3, 6: 1, 7: 1, 8: 1, 9: 3, 10: 2}},
+    {'name': 'Orgullo y prejuicio, Bajo la misma estrella, Cometas en el cielo', 'answers': {1: 2, 2: 2, 3: 2, 4: 2, 5: 1, 6: 2, 7: 4, 8: 2, 9: 2, 10: 1}},
+    {'name': 'Harry Potter and the Sorcerers Stone J.K. Rowling, El nombre del viento, El asesinato de Roger Ackroyd', 'answers': {1: 3, 2: 3, 3: 1, 4: 3, 5: 4, 6: 1, 7: 3, 8: 3, 9: 3, 10: 3}},
+    {'name': 'La chica del tren, El código Da Vinci Dan Brown libro, Perdida Gillian Flynn', 'answers': {1: 4, 2: 1, 3: 3, 4: 4, 5: 3, 6: 2, 7: 3, 8: 2, 9: 2, 10: 3}},
+    {'name': 'Cien años de soledad, Crimen y castigo, Matar a un ruiseñor', 'answers': {1: 2, 2: 2, 3: 2, 4: 2, 5: 4, 6: 2, 7: 2, 8: 2, 9: 3, 10: 2}},
+    {'name': 'Maus Art Spiegelman, Watchmen, Sandman: Preludios y nocturnos', 'answers': {1: 4, 2: 1, 3: 4, 4: 4, 5: 2, 6: 2, 7: 1, 8: 2, 9: 1, 10: 4}},
+    {'name': 'El señor de los anillos 1, Juego de tronos 1, La rueda del tiempo: El ojo del mundo', 'answers': {1: 3, 2: 3, 3: 1, 4: 3, 5: 3, 6: 1, 7: 2, 8: 1, 9: 3, 10: 2}},
+    {'name': 'Sapiens: De animales a dioses, El diario de Ana Frank, El hombre en busca de sentido', 'answers': {1: 2, 2: 2, 3: 2, 4: 2, 5: 4, 6: 1, 7: 3, 8: 2, 9: 2, 10: 2}},
+    {'name': 'Normal People, La casa de los espíritus, La sombra del viento', 'answers': {1: 2, 2: 2, 3: 2, 4: 2, 5: 4, 6: 2, 7: 2, 8: 2, 9: 2, 10: 3}},
+    {'name': '1984 George Orwell, El cuento de la criada Margaret Atwood, Un mundo feliz Aldous Huxley', 'answers': {1: 1, 2: 1, 3: 1, 4: 1, 5: 4, 6: 2, 7: 3, 8: 2, 9: 2, 10: 3}},
 ]
 
 questions_so_far = []
