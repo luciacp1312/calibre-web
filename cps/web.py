@@ -48,10 +48,12 @@ from . import web
 from sqlalchemy import exc, null
 from . import config_sql
 from io import BytesIO
+#import pyttsx3
 from flask import jsonify
 import zipfile
 from .recomendador import *
 from cps.db import Answer
+from .helper import get_epub_path
 ############################### NUEVO ###############################
 
 from werkzeug.datastructures import Headers
@@ -1339,7 +1341,6 @@ def recomendaciones():
 
     # Obtener las respuestas guardadas del usuario
     user_answers = ub.session.query(ub.Answer).filter_by(user_id=user_id).all()
-    print(f"DEBUG: Respuestas del usuario: {user_answers}")  # DEBUG
     
     # Calcular las probabilidades y determinar el género recomendado
     questions_so_far = [ans.question_id for ans in user_answers]
@@ -1366,7 +1367,6 @@ def recomendaciones():
             })
     
     '''# Guardar recomendación
-    print("DEBUG: Guardando recomendación")  # DEBUG
     existing_recommendation = ub.session.query(ub.Recommendation).filter_by(user_id=user_id).first()
     if existing_recommendation:
         #existing_recommendation.result = recommended_books_names
@@ -1374,7 +1374,6 @@ def recomendaciones():
     else:
         new_recommendation = ub.Recommendation(user_id=user_id, result=result)
         ub.session.add(new_recommendation)
-    print("DEBUG: Recomendación guardada")  # DEBUG
         
     ub.session.commit()
     print(f"Book Recommendations: {result}") # DEBUG
@@ -1383,13 +1382,8 @@ def recomendaciones():
     return render_title_template(
         'detail_recomendador.html',
         result=result,
+        # questions=questions,
         title="Recomendador")
-    '''return render_title_template(
-        'recomendador.html',
-        questions=questions,
-        result=result,
-        title="Recomendador"
-    )'''
     
 #################################### NUEVO recomendador ####################################
 
@@ -1403,22 +1397,19 @@ def get_book_info(isbn=None, title=None):
     if isbn:
         params['q'] = f'isbn:{isbn}'
     elif title:
-        params['q'] = f'title:{title}'
+        params['q'] = f'intitle:{title}'
     else:
         raise ValueError("Either ISBN or title must be provided.")
 
-    # Realizar la búsqueda
     params['key'] = 'AIzaSyACIkFe67iKjQSMS01E3BPiftD9AAs8QAU'
     
     response = requests.get(base_url, params=params)
     response.raise_for_status()
     data = response.json()
 
-    # Buscar el primer resultado en la respuesta
     items = data.get('items')
     if not items:
         return None
-    
     
     book = items[0]['volumeInfo']
     title = book.get('title', 'Unknown')
@@ -1427,7 +1418,7 @@ def get_book_info(isbn=None, title=None):
     description = book.get('description', 'No description available.')
     page_count = book.get('pageCount', 'Unknown')
     language = book.get('language', 'Unknown')
-    thumbnail = book.get('imageLinks', {}).get('thumbnail', 'No image available.')
+    thumbnail = book.get('imageLinks', {}).get('thumbnail', 'https://via.placeholder.com/150x220?text=No+Image')
 
     book_info = {
         'title': title,
@@ -1439,12 +1430,12 @@ def get_book_info(isbn=None, title=None):
         'thumbnail': thumbnail
     }
 
-    print(f"DEBUG: Información del libro: {book_info}")  # DEBUG
     return book_info
+
 #################################### NUEVO buscar libro recomendador ####################################
 
 #################################### NUEVO audio ####################################
-@app.route('/download_audio/<int:book_id>')
+'''@app.route('/download_audio/<int:book_id>')
 @login_required
 def download_audio(book_id):
     # Buscar el libro en la base de datos
@@ -1493,17 +1484,111 @@ def download_audio(book_id):
         as_attachment=True,
         download_name=f"{book.title}.mp3",
         mimetype="audio/mpeg"
-    )
-#################################### NUEVO audio ####################################
+    )'''
+    
 
-#################################### NUEVO (guardar audio en base de datos, ahora no funciona) ####################################
+def extract_text_from_epub(epub_path):
+    book = epub.read_epub(epub_path)
+    text_content = []
+
+    for item in book.get_items():
+        if item.get_type() == ebooklib.ITEM_DOCUMENT:
+            soup = BeautifulSoup(item.get_body_content(), 'html.parser')
+            text_content.append(soup.get_text())
+
+    return ' '.join(text_content)
+
+def get_audio_download_link(book_id, client):
+    book = calibre_db.get_book(book_id)
+    if not book:
+        log.error(f"Book id {book_id} not found for downloading audio")
+        abort(404)
+
+    data = calibre_db.get_book_format(book_id, 'EPUB')
+    if not data:
+        log.error(f"No EPUB format found for book id {book_id}")
+        abort(404)
+
+    try:
+        epub_path = os.path.join(config.get_book_path(), book.path, data.name + ".epub")
+        text_content = extract_text_from_epub(epub_path)
+        # Asegurar que data esté en bytes
+        '''if not isinstance(data, bytes):
+            data = bytes(data)
+        epub_file = BytesIO(data)
+        text_content = ""
+        with zipfile.ZipFile(epub_file, 'r') as z:
+            for filename in z.namelist():
+                if filename.endswith('.xhtml') or filename.endswith('.html'):
+                    with z.open(filename) as f:
+                        text_content += f.read().decode('utf-8')
+        '''
+        if not text_content:
+            log.error(f"No content found in the EPUB for book id {book_id}")
+            abort(404)
+
+        #Con GTTS
+        tts = gTTS(text=text_content, lang='es')
+        audio_file = BytesIO()
+        tts.write_to_fp(audio_file)
+        audio_file.seek(0)
+
+        '''# Con pyttsx3
+        audio_file = BytesIO()
+        engine = pyttsx3.init()
+        engine.save_to_file(text_content, audio_file)
+        engine.runAndWait()
+        audio_file.seek(0)'''
+        
+        return send_file(
+            audio_file,
+            as_attachment=True,
+            download_name=f"{book.title}.mp3",
+            mimetype="audio/mpeg"
+        )
+    except Exception as e:
+        log.error(f"Error while generating audio: {str(e)}")
+        abort(500)
+        
+
 @web.route("/download_audio/<int:book_id>", defaults={'anyname': 'None'})
+@web.route("/download_audio/<int:book_id>/<anyname>")
+@login_required_if_no_ano
+@download_required
+def download_audio(book_id, anyname):
+    client = "kobo" if "Kobo" in request.headers.get('User-Agent') else ""
+    return get_audio_download_link(book_id, client)
+
+'''def get_audio_download_link(book_id, client):
+    book = db.get_filtered_book(book_id, allow_show_archived=True)
+    if book:
+        try:
+            epub_path = get_epub_path(book_id)
+            text = extract_text_from_epub(epub_path)
+            language = 'es'
+            speech = gTTS(text=text, lang=language, slow=False)
+            output_path = os.path.join(config.get_book_path(), book.path, f"{book.name}.mp3")
+            speech.save(output_path)
+
+            response = make_response(send_file(output_path, as_attachment=True, download_name=f"{book.name}.mp3"))
+            return response
+        except Exception as e:
+            log.error(f"Error while generating audio: {str(e)}")
+            abort(500)
+    else:
+        log.error("Book id {} not found for downloading audio".format(book_id))
+        abort(404)
+'''        
+
+    
+'''@web.route("/download_audio/<int:book_id>", defaults={'anyname': 'None'})
 @web.route("/download_audio/<int:book_id>/<anyname>")
 @login_required
 @download_required
 def download_audio(book_id, anyname):
     client = "kobo" if "Kobo" in request.headers.get('User-Agent') else ""
     return get_audio_download_link(book_id, client)
+
 
 def get_audio_download_link(book_id, client):
     book = calibre_db.get_filtered_book(book_id, allow_show_archived=True)
@@ -1538,20 +1623,10 @@ def get_audio_download_link(book_id, client):
 
     else:
         log.error("Book id {} not found for downloading".format(book_id))
-    abort(404)
+    abort(404)'''
     
-def extract_text_from_epub(epub_path):
-    book = epub.read_epub(epub_path)
-    text_content = []
-    
-    for item in book.get_items():
-        if item.get_type() == ebooklib.ITEM_DOCUMENT:
-            soup = BeautifulSoup(item.get_body_content(), 'html.parser')
-            text_content.append(soup.get_text())
-    
-    return ' '.join(text_content)
 
-# db.session no lo reconoce, quizás es ub.session
+'''# db.session no lo reconoce, quizás es ub.session
 def update_download_audio(book_id, user_id):
     check = db.session.query(ub.Downloads).filter(ub.Downloads.user_id == user_id).filter(ub.Downloads.book_id == book_id).first()
 
@@ -1561,8 +1636,8 @@ def update_download_audio(book_id, user_id):
         try:
             db.session.commit()
         except exc.OperationalError:
-            db.session.rollback()
-#################################### NUEVO (guardar audio en base de datos) ####################################
+            db.session.rollback()'''
+#################################### NUEVO audio ####################################
 
 @web.route('/send/<int:book_id>/<book_format>/<int:convert>', methods=["POST"])
 @login_required_if_no_ano

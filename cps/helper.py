@@ -41,7 +41,7 @@ from werkzeug.datastructures import Headers
 from werkzeug.security import generate_password_hash
 from markupsafe import escape
 from urllib.parse import quote
-from . import config_sql
+from . import config_sql, db
 
 try:
     import advocate
@@ -1144,9 +1144,17 @@ def get_download_link(book_id, book_format, client):
 
 
 #################################### NUEVO ####################################
-def get_epub_path():# Hay un metodo get_epub_path en config_sql.py
+'''def get_epub_path():# Hay un metodo get_epub_path en config_sql.py
     return config_sql.ConfigSQL.get_book_path() # Ruta de los libros
+'''
+def get_epub_path(book_id):
+    book = db.get_filtered_book(book_id, allow_show_archived=True)
+    if not book:
+        raise ValueError("Book not found")
 
+    epub_file = f"{book.id}.epub"  # Asegúrate de que el archivo tiene esta estructura en tu sistema
+    epub_path = os.path.join(config.get_book_path(), book.path, epub_file)
+    return epub_path
 #################################### NUEVO ####################################
 
 def clear_cover_thumbnail_cache(book_id):
