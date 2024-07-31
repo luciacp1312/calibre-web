@@ -43,12 +43,12 @@ from gtts import gTTS
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
+#import pyttsx3
 import os
 from . import web
 from sqlalchemy import exc, null
 from . import config_sql
 from io import BytesIO
-#import pyttsx3
 from flask import jsonify
 import zipfile
 from .recomendador import *
@@ -1435,58 +1435,6 @@ def get_book_info(isbn=None, title=None):
 #################################### NUEVO buscar libro recomendador ####################################
 
 #################################### NUEVO audio ####################################
-'''@app.route('/download_audio/<int:book_id>')
-@login_required
-def download_audio(book_id):
-    # Buscar el libro en la base de datos
-    book = calibre_db.get_book(book_id)
-    
-    if not book:
-        return "Book not found", 404
-
-    # Verificar si el usuario tiene permisos para descargar
-    if not current_user.role_download():
-        return "Permission denied", 403
-
-    # Obtener todas las instancias de Data asociadas a ese libro específico
-    #book = ub.session.query(ub.Downloads).filter(ub.Downloads.user_id == int(current_user.id)).filter(ub.Downloads.book_id == book_id).first()
-    #book = calibre_db.session.query(ub.Downloads).filter(ub.Downloads.book_id == book_id).first()
-    
-    data = calibre_db.get_book_format(book_id, 'EPUB')
-    # Verificar si hay instancias de Data asociadas al libro
-    if not data:
-        return "No data found for the book", 404
-
-
-    # Extraer el contenido del EPUB
-    # Convertir data a bytes si es necesario
-    epub_file = BytesIO(data)
-        
-    #epub_file = BytesIO(data)
-    book_content = ""
-    with zipfile.ZipFile(epub_file, 'r') as z:
-        for filename in z.namelist():
-            if filename.endswith('.xhtml') or filename.endswith('.html'):
-                with z.open(filename) as f:
-                    book_content += f.read().decode('utf-8')
-
-    if not book_content:
-        return "No content found in the EPUB", 404
-    
-    tts = gTTS(text=book_content, lang='es')
-    audio_file = BytesIO()
-    tts.write_to_fp(audio_file)
-    audio_file.seek(0)
-
-    # Devolver el archivo de audio generado como un archivo adjunto descargable
-    return send_file(
-        audio_file,
-        as_attachment=True,
-        download_name=f"{book.title}.mp3",
-        mimetype="audio/mpeg"
-    )'''
-    
-
 def extract_text_from_epub(epub_path):
     book = epub.read_epub(epub_path)
     text_content = []
@@ -1512,8 +1460,10 @@ def get_audio_download_link(book_id, client):
     try:
         epub_path = os.path.join(config.get_book_path(), book.path, data.name + ".epub")
         text_content = extract_text_from_epub(epub_path)
+        
+        '''# ESTO ESTABA COMENTADO
         # Asegurar que data esté en bytes
-        '''if not isinstance(data, bytes):
+        if not isinstance(data, bytes):
             data = bytes(data)
         epub_file = BytesIO(data)
         text_content = ""
@@ -1522,7 +1472,9 @@ def get_audio_download_link(book_id, client):
                 if filename.endswith('.xhtml') or filename.endswith('.html'):
                     with z.open(filename) as f:
                         text_content += f.read().decode('utf-8')
-        '''
+        
+        # ESTO ESTABA COMENTADO'''
+        
         if not text_content:
             log.error(f"No content found in the EPUB for book id {book_id}")
             abort(404)
@@ -1532,13 +1484,6 @@ def get_audio_download_link(book_id, client):
         audio_file = BytesIO()
         tts.write_to_fp(audio_file)
         audio_file.seek(0)
-
-        '''# Con pyttsx3
-        audio_file = BytesIO()
-        engine = pyttsx3.init()
-        engine.save_to_file(text_content, audio_file)
-        engine.runAndWait()
-        audio_file.seek(0)'''
         
         return send_file(
             audio_file,
@@ -1558,86 +1503,54 @@ def get_audio_download_link(book_id, client):
 def download_audio(book_id, anyname):
     client = "kobo" if "Kobo" in request.headers.get('User-Agent') else ""
     return get_audio_download_link(book_id, client)
-
-'''def get_audio_download_link(book_id, client):
-    book = db.get_filtered_book(book_id, allow_show_archived=True)
-    if book:
-        try:
-            epub_path = get_epub_path(book_id)
-            text = extract_text_from_epub(epub_path)
-            language = 'es'
-            speech = gTTS(text=text, lang=language, slow=False)
-            output_path = os.path.join(config.get_book_path(), book.path, f"{book.name}.mp3")
-            speech.save(output_path)
-
-            response = make_response(send_file(output_path, as_attachment=True, download_name=f"{book.name}.mp3"))
-            return response
-        except Exception as e:
-            log.error(f"Error while generating audio: {str(e)}")
-            abort(500)
-    else:
-        log.error("Book id {} not found for downloading audio".format(book_id))
+ 
+#################################### NUEVO antiguo descargar audio ####################################
+   
+    
+#################################### NUEVO mostrar audio (no descarga) ####################################
+'''def get_audio_stream(book_id, client):
+    book = calibre_db.get_book(book_id)
+    if not book:
+        log.error(f"Book id {book_id} not found for streaming audio")
         abort(404)
-'''        
 
-    
-'''@web.route("/download_audio/<int:book_id>", defaults={'anyname': 'None'})
-@web.route("/download_audio/<int:book_id>/<anyname>")
-@login_required
+    data = calibre_db.get_book_format(book_id, 'EPUB')
+    if not data:
+        log.error(f"No EPUB format found for book id {book_id}")
+        abort(404)
+
+    try:
+        epub_path = os.path.join(config.get_book_path(), book.path, data.name + ".epub")
+        text_content = extract_text_from_epub(epub_path)
+
+        if not text_content:
+            log.error(f"No content found in the EPUB for book id {book_id}")
+            abort(404)
+
+        # Con GTTS
+        tts = gTTS(text=text_content, lang='es')
+        audio_file = BytesIO()
+        tts.write_to_fp(audio_file)
+        audio_file.seek(0)
+
+        return send_file(
+            audio_file,
+            as_attachment=False,  # Cambiado a False para streaming
+            download_name=f"{book.title}.mp3",
+            mimetype="audio/mpeg"
+        )
+    except Exception as e:
+        log.error(f"Error while generating audio: {str(e)}")
+        abort(500)
+
+@web.route("/stream_audio/<int:book_id>")
+@login_required_if_no_ano
 @download_required
-def download_audio(book_id, anyname):
+def stream_audio(book_id):
     client = "kobo" if "Kobo" in request.headers.get('User-Agent') else ""
-    return get_audio_download_link(book_id, client)
+    return get_audio_stream(book_id, client)'''
 
-
-def get_audio_download_link(book_id, client):
-    book = calibre_db.get_filtered_book(book_id, allow_show_archived=True)
-    if book:
-        config_sql_instancia = config_sql.ConfigSQL()
-        secret_key = 'UMHEqHWeDO8qZjF7x-JXvf_Wx5gcyOOEAQz2yTW2uk8='
-        
-        # Crear la fábrica de sesiones (sessionmaker)
-        #db_session_factory = db.sessionmaker(bind=db.engine)
-        # config_sql_instancia.init_config(db.scoped_session(db_session_factory), secret_key, client)
-        config_sql_instancia.init_config(ub.session, secret_key, client)
-        epub_path = config_sql_instancia.get_book_path()
-        if not epub_path:
-            flash(_('EPUB file not found.'), 'danger')
-            return redirect(url_for('web.index'))
-
-        text = extract_text_from_epub(epub_path)
-        if not text:
-            flash(_('Failed to extract text from EPUB.'), 'danger')
-            return redirect(url_for('web.index'))
-
-        language = 'es'
-        speech = gTTS(text=text, lang=language, slow=False)
-        
-        output_path = f'temp_{book_id}.mp3'
-        speech.save(output_path)
-        
-        # Guarda el registro de descarga en la base de datos
-        update_download_audio(book_id, int(current_user.id))
-        
-        return send_file(output_path, as_attachment=True, download_name=f'{book_id}.mp3')
-
-    else:
-        log.error("Book id {} not found for downloading".format(book_id))
-    abort(404)'''
-    
-
-'''# db.session no lo reconoce, quizás es ub.session
-def update_download_audio(book_id, user_id):
-    check = db.session.query(ub.Downloads).filter(ub.Downloads.user_id == user_id).filter(ub.Downloads.book_id == book_id).first()
-
-    if not check:
-        new_download = ub.Downloads(user_id=user_id, book_id=book_id)
-        db.session.add(new_download)
-        try:
-            db.session.commit()
-        except exc.OperationalError:
-            db.session.rollback()'''
-#################################### NUEVO audio ####################################
+#################################### NUEVO mostrar audio (no descarga) ####################################
 
 @web.route('/send/<int:book_id>/<book_format>/<int:convert>', methods=["POST"])
 @login_required_if_no_ano
