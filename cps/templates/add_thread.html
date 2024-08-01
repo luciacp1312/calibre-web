@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Hilo</title>
+</head>
+<body>
+    <h1>Agregar Hilo</h1>
+    <form method="post">
+        <label for="title">Título:</label>
+        <input type="text" id="title" name="title" required>
+        <br>
+        <label for="forum_id">Foro:</label>
+        <select id="forum_id" name="forum_id" required>
+            {% for forum in forums %}
+            <option value="{{ forum.id }}">{{ forum.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="user_id">Usuario:</label>
+        <select id="user_id" name="user_id" required>
+            {% for user in users %}
+            <option value="{{ user.id }}">{{ user.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Agregar Hilo">
+    </form>
+    <a href="{{ url_for('manage_threads') }}">Volver a la lista de hilos</a>
+</body>
+</html>

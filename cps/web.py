@@ -1434,6 +1434,98 @@ def get_book_info(isbn=None, title=None):
 
 #################################### NUEVO buscar libro recomendador ####################################
 
+################################ NUEVO foro ################################
+# Gestión de categorías
+@app.route('/categories')
+@login_required
+def manage_categories():
+    categories = ub.session.query(ub.ForumCategory).all()
+    return render_template('manage_categories.html', categories=categories)
+
+@app.route('/categories/add', methods=['GET', 'POST'])
+@login_required
+def add_category():
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        category = ub.ForumCategory(name=name, description=description)
+        ub.session.add(category)
+        ub.session.commit()
+        flash('Category added successfully!', 'success')
+        return redirect(url_for('manage_categories'))
+    return render_template('add_category.html')
+
+# Gestión de foros
+@app.route('/forums')
+@login_required
+def manage_forums():
+    forums = ub.session.query(ub.Forum).all()
+    return render_template('manage_forums.html', forums=forums)
+
+@app.route('/forums/add', methods=['GET', 'POST'])
+@login_required
+def add_forum():
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        category_id = request.form['category_id']
+        forum = ub.Forum(name=name, description=description, category_id=category_id)
+        ub.session.add(forum)
+        ub.session.commit()
+        flash('Forum added successfully!', 'success')
+        return redirect(url_for('manage_forums'))
+    categories = ub.session.query(ub.ForumCategory).all()
+    return render_template('add_forum.html', categories=categories)
+
+# Gestión de Hilos
+@app.route('/threads')
+@login_required
+def manage_threads():
+    threads = ub.session.query(ub.Thread).all()
+    return render_template('manage_threads.html', threads=threads)
+
+@app.route('/threads/add', methods=['GET', 'POST'])
+@login_required
+def add_thread():
+    if request.method == 'POST':
+        title = request.form['title']
+        forum_id = request.form['forum_id']
+        user_id = request.form['user_id']
+        thread = ub.Thread(title=title, forum_id=forum_id, user_id=user_id)
+        ub.session.add(thread)
+        ub.session.commit()
+        flash('Thread added successfully!', 'success')
+        return redirect(url_for('manage_threads'))
+    forums = ub.session.query(ub.Forum).all()
+    users = ub.session.query(ub.User).all()
+    return render_template('add_thread.html', forums=forums, users=users)
+
+# Gestión de Publicaciones
+@app.route('/posts')
+@login_required
+def manage_posts():
+    posts = ub.session.query(ub.Post).all()
+    return render_template('manage_posts.html', posts=posts)
+
+@app.route('/posts/add', methods=['GET', 'POST'])
+@login_required
+def add_post():
+    if request.method == 'POST':
+        content = request.form['content']
+        thread_id = request.form['thread_id']
+        user_id = request.form['user_id']
+        post = ub.Post(content=content, thread_id=thread_id, user_id=user_id)
+        ub.session.add(post)
+        ub.session.commit()
+        flash('Post added successfully!', 'success')
+        return redirect(url_for('manage_posts'))
+    threads = ub.session.query(ub.Thread).all()
+    users = ub.session.query(ub.User).all()
+    return render_template('add_post.html', threads=threads, users=users)
+
+################################ NUEVO foro ################################
+
+
 #################################### NUEVO audio ####################################
 def extract_text_from_epub(epub_path):
     book = epub.read_epub(epub_path)

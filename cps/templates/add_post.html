@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Publicación</title>
+</head>
+<body>
+    <h1>Agregar Publicación</h1>
+    <form method="post">
+        <label for="content">Contenido:</label>
+        <textarea id="content" name="content" required></textarea>
+        <br>
+        <label for="thread_id">Hilo:</label>
+        <select id="thread_id" name="thread_id" required>
+            {% for thread in threads %}
+            <option value="{{ thread.id }}">{{ thread.title }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="user_id">Usuario:</label>
+        <select id="user_id" name="user_id" required>
+            {% for user in users %}
+            <option value="{{ user.id }}">{{ user.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Agregar Publicación">
+    </form>
+    <a href="{{ url_for('manage_posts') }}">Volver a la lista de publicaciones</a>
+</body>
+</html>

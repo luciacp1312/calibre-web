@@ -514,7 +514,6 @@ class AlchemyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
-
 class CalibreDB:
     _init = False
     engine = None

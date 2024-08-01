@@ -87,6 +87,7 @@ except ImportError as err:
 admi = Blueprint('admin', __name__)
 
 
+
 def admin_required(f):
     """
     Checks if current_user.role == 1

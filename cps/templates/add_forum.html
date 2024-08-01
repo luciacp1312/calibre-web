@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Foro</title>
+</head>
+<body>
+    <h1>Agregar Foro</h1>
+    <form method="post">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="description">Descripción:</label>
+        <textarea id="description" name="description"></textarea>
+        <br>
+        <label for="category_id">Categoría:</label>
+        <select id="category_id" name="category_id" required>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Agregar Foro">
+    </form>
+    <a href="{{ url_for('manage_forums') }}">Volver a la lista de foros</a>
+</body>
+</html>

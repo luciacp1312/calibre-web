@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Categoría</title>
+</head>
+<body>
+    <h1>Agregar Categoría</h1>
+    <form method="post">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="description">Descripción:</label>
+        <textarea id="description" name="description"></textarea>
+        <br>
+        <input type="submit" value="Agregar Categoría">
+    </form>
+    <a href="{{ url_for('manage_categories') }}">Volver a la lista de categorías</a>
+</body>
+</html>

@@ -40,7 +40,7 @@ except ImportError as e:
     except ImportError as e:
         OAuthConsumerMixin = BaseException
         oauth_support = False
-from sqlalchemy import create_engine, exc, exists, event, text
+from sqlalchemy import TIMESTAMP, create_engine, exc, exists, event, text
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import String, Integer, SmallInteger, Boolean, DateTime, Float, JSON
 from sqlalchemy.orm.attributes import flag_modified
@@ -248,10 +248,64 @@ class User(UserBase, Base):
     view_settings = Column(JSON, default={})
     kobo_only_shelves_sync = Column(Integer, default=0)
     
-    #################################### NUEVO recomendador ####################################
+    #################################### NUEVO recomendador relación ####################################
     answers = relationship('Answer', back_populates='user')
-    #################################### NUEVO recomendador ####################################
+    #################################### NUEVO recomendador relación ####################################
+    #################################### NUEVO foro relaciones ####################################
+    threads = relationship('db.Thread', order_by='Thread.id', back_populates='user')
+    posts = relationship('db.Post', order_by='Post.id', back_populates='user')
+    #################################### NUEVO foro relaciones ####################################
     
+############################## NUEVO foro ################################
+class ForumCategory(Base):
+    __tablename__ = 'forum_categories'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=True)
+    # Relación con forums
+    forums = relationship('Forum', order_by='Forum.id', back_populates='category')
+
+class Forum(Base):
+    __tablename__ = 'forums'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=True)
+    category_id = Column(Integer, ForeignKey('forum_categories.id'), nullable=False)
+    category = relationship('ForumCategory', back_populates='forums')
+    # Relación con threads
+    threads = relationship('Thread', order_by='Thread.id', back_populates='forum')
+
+ForumCategory.forums = relationship('Forum', order_by=Forum.id, back_populates='category')
+
+class Thread(Base):
+    __tablename__ = 'threads'
+    id = Column(Integer, primary_key=True)
+    title = Column(String, nullable=False)
+    created_at = Column(TIMESTAMP, default=datetime.datetime.utcnow, nullable=False)
+    forum_id = Column(Integer, ForeignKey('forums.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    forum = relationship('Forum', back_populates='threads')
+    user = relationship('User', back_populates='threads')
+    # Relación con posts
+    posts = relationship('Post', order_by='Post.id', back_populates='thread')
+
+Forum.threads = relationship('Thread', order_by=Thread.id, back_populates='forum')
+User.threads = relationship('Thread', order_by=Thread.id, back_populates='user')
+
+class Post(Base):
+    __tablename__ = 'posts'
+    id = Column(Integer, primary_key=True)
+    content = Column(String, nullable=False)
+    created_at = Column(TIMESTAMP, default=datetime.datetime.utcnow, nullable=False)
+    thread_id = Column(Integer, ForeignKey('threads.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    thread = relationship('Thread', back_populates='posts')
+    user = relationship('User', back_populates='posts')
+
+Thread.posts = relationship('Post', order_by=Post.id, back_populates='thread')
+User.posts = relationship('Post', order_by=Post.id, back_populates='user')
+############################## NUEVO foro ################################
+
 #################################### NUEVO recomendador ####################################
 class Answer(Base):
     __tablename__ = 'answers'
