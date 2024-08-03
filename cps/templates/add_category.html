@@ -1,20 +1,21 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Agregar Categoría</title>
-</head>
-<body>
-    <h1>Agregar Categoría</h1>
-    <form method="post">
-        <label for="name">Nombre:</label>
-        <input type="text" id="name" name="name" required>
-        <br>
-        <label for="description">Descripción:</label>
-        <textarea id="description" name="description"></textarea>
-        <br>
-        <input type="submit" value="Agregar Categoría">
+{% extends "layout.html" %}
+
+{% block title %}Agregar Categoría{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h2>Agregar Categoría</h2>
+    <form method="post" action="{{ url_for('add_category') }}">
+        <div class="form-group">
+            <label for="name">Nombre:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Descripción:</label>
+            <textarea class="form-control" id="description" name="description"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar Categoría</button>
     </form>
-    <a href="{{ url_for('manage_categories') }}">Volver a la lista de categorías</a>
-</body>
-</html>
+    <a href="{{ url_for('manage_categories') }}" class="btn btn-secondary mt-3">Volver a Categorías</a>
+</div>
+{% endblock %}

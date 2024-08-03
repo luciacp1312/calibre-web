@@ -1440,28 +1440,43 @@ def get_book_info(isbn=None, title=None):
 @login_required
 def manage_categories():
     categories = ub.session.query(ub.ForumCategory).all()
-    return render_template('manage_categories.html', categories=categories)
-
+    return render_title_template(
+        'manage_categories.html',
+        categories=categories,
+        title="Categories",
+        page='forum'
+    )
+    
 @app.route('/categories/add', methods=['GET', 'POST'])
 @login_required
 def add_category():
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
+        
         category = ub.ForumCategory(name=name, description=description)
         ub.session.add(category)
         ub.session.commit()
         flash('Category added successfully!', 'success')
         return redirect(url_for('manage_categories'))
-    return render_template('add_category.html')
+    return render_title_template(
+        'add_category.html',
+        title="Categories",
+        page = 'forum'
+    )
 
 # Gestión de foros
 @app.route('/forums')
 @login_required
 def manage_forums():
     forums = ub.session.query(ub.Forum).all()
-    return render_template('manage_forums.html', forums=forums)
-
+    return render_title_template(
+        'manage_forums.html',
+        forums=forums,
+        title="Forum",
+        page='forum'
+    )
+    
 @app.route('/forums/add', methods=['GET', 'POST'])
 @login_required
 def add_forum():
@@ -1475,15 +1490,25 @@ def add_forum():
         flash('Forum added successfully!', 'success')
         return redirect(url_for('manage_forums'))
     categories = ub.session.query(ub.ForumCategory).all()
-    return render_template('add_forum.html', categories=categories)
+    return render_title_template(
+        'add_forum.html',
+        categories=categories,
+        title="Forum",
+        page = 'forum'
+    )
 
 # Gestión de Hilos
 @app.route('/threads')
 @login_required
 def manage_threads():
     threads = ub.session.query(ub.Thread).all()
-    return render_template('manage_threads.html', threads=threads)
-
+    return render_title_template(
+        'manage_threads.html',
+        threads=threads,
+        title="Threads",
+        page='forum'
+    )
+    
 @app.route('/threads/add', methods=['GET', 'POST'])
 @login_required
 def add_thread():
@@ -1498,15 +1523,26 @@ def add_thread():
         return redirect(url_for('manage_threads'))
     forums = ub.session.query(ub.Forum).all()
     users = ub.session.query(ub.User).all()
-    return render_template('add_thread.html', forums=forums, users=users)
+    return render_title_template(
+        'add_thread.html',
+        forums=forums,
+        users=users,
+        title="Threads",
+        page = 'forum'
+    )
 
 # Gestión de Publicaciones
 @app.route('/posts')
 @login_required
 def manage_posts():
     posts = ub.session.query(ub.Post).all()
-    return render_template('manage_posts.html', posts=posts)
-
+    return render_title_template(
+        'manage_posts.html',
+        posts=posts,
+        title="Posts",
+        page='forum'
+    )
+    
 @app.route('/posts/add', methods=['GET', 'POST'])
 @login_required
 def add_post():
@@ -1521,8 +1557,13 @@ def add_post():
         return redirect(url_for('manage_posts'))
     threads = ub.session.query(ub.Thread).all()
     users = ub.session.query(ub.User).all()
-    return render_template('add_post.html', threads=threads, users=users)
-
+    return render_title_template(
+        'add_post.html',
+        threads=threads,
+        users=users,
+        title="Posts",
+        page = 'forum'
+    )
 ################################ NUEVO foro ################################
 
 

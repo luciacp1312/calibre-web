@@ -1,29 +1,28 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Gestión de Categorías</title>
-</head>
-<body>
-    <h1>Gestión de Categorías</h1>
-    <a href="{{ url_for('add_category') }}">Agregar Categoría</a>
-    <table>
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="container">
+    <h1>{{ title }}</h1>
+    <a href="{{ url_for('add_category') }}" class="btn btn-primary">Add Category</a>
+    <table class="table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for category in categories %}
-            <tr>
-                <td>{{ category.id }}</td>
-                <td>{{ category.name }}</td>
-                <td>{{ category.description }}</td>
-            </tr>
+                <tr>
+                    <td>{{ category.name }}</td>
+                    <td>{{ category.description }}</td>
+                    <td>
+                        <!-- Actions like Edit/Delete could go here -->
+                    </td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
-</body>
-</html>
+</div>
+{% endblock %}

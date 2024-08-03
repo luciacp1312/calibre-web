@@ -1,31 +1,30 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Gestión de Publicaciones</title>
-</head>
-<body>
-    <h1>Gestión de Publicaciones</h1>
-    <a href="{{ url_for('add_post') }}">Agregar Publicación</a>
-    <table>
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="container">
+    <h1>{{ title }}</h1>
+    <a href="{{ url_for('add_post') }}" class="btn btn-primary">Add Post</a>
+    <table class="table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Contenido</th>
-                <th>Hilo</th>
-                <th>Usuario</th>
+                <th>Content</th>
+                <th>Thread</th>
+                <th>User</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for post in posts %}
-            <tr>
-                <td>{{ post.id }}</td>
-                <td>{{ post.content }}</td>
-                <td>{{ post.thread.title }}</td>
-                <td>{{ post.user.name }}</td>
-            </tr>
+                <tr>
+                    <td>{{ post.content }}</td>
+                    <td>{{ post.thread.title }}</td>
+                    <td>{{ post.user.username }}</td>
+                    <td>
+                        <!-- Actions like Edit/Delete could go here -->
+                    </td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
-</body>
-</html>
+</div>
+{% endblock %}
