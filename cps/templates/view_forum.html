@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<div class="container">
+    <h1>{{ forum.name }}</h1>
+    <p>{{ forum.description }}</p>
+    <a href="{{ url_for('add_thread', forum_id=forum.id) }}" class="btn btn-primary">Add Thread</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>User</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for thread in threads %}
+                <tr>
+                    <td><a href="{{ url_for('view_thread', thread_id=thread.id) }}">{{ thread.title }}</a></td>
+                    <td>{{ thread.user.username }}</td>
+                    <td>
+                        <!-- Actions like Edit/Delete could go here -->
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

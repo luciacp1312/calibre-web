@@ -1514,6 +1514,24 @@ def add_forum():
         page = 'forum'
     )
 
+# Ver hilos en un foro específico
+@app.route('/forums/<int:forum_id>')
+@login_required
+def view_forum(forum_id):
+    forum = ub.session.query(ub.Forum).get(forum_id)
+    if not forum:
+        flash('Forum not found!', 'danger')
+        return redirect(url_for('manage_forums'))
+    threads = ub.session.query(ub.Thread).filter_by(forum_id=forum_id).all()
+    return render_title_template(
+        'view_forum.html',
+        forum=forum,
+        threads=threads,
+        title=forum.name,
+        page='forum'
+    )
+
+
 # Gestión de Hilos
 @app.route('/threads')
 @login_required
@@ -1529,23 +1547,52 @@ def manage_threads():
 @app.route('/threads/add', methods=['GET', 'POST'])
 @login_required
 def add_thread():
+    forum_id = request.args.get('forum_id', None)
     if request.method == 'POST':
         title = request.form['title']
         forum_id = request.form['forum_id']
-        user_id = request.form['user_id']
+        #user_id = request.form['user_id']
+        #anonymous = request.form.get('anonymous')
+        
+        user_id = current_user.id
+        '''# Definir el user_id dependiendo de la opción seleccionada
+        if anonymous == 'user':
+            user_id = current_user.id
+        else:
+            user_id = None  # O algún valor que indique "anónimo", si es necesario en tu lógica
+        '''
+        
+        
         thread = ub.Thread(title=title, forum_id=forum_id, user_id=user_id)
         ub.session.add(thread)
         ub.session.commit()
         flash('Thread added successfully!', 'success')
-        return redirect(url_for('manage_threads'))
+        return redirect(url_for('view_forum', forum_id=forum_id))
     forums = ub.session.query(ub.Forum).all()
-    users = ub.session.query(ub.User).all()
+    #users = ub.session.query(ub.User).all()
     return render_title_template(
         'add_thread.html',
         forums=forums,
-        users=users,
+        forum_id=forum_id,
         title="Threads",
         page = 'forum'
+    )
+
+# Ver posts en un hilo específico
+@app.route('/threads/<int:thread_id>')
+@login_required
+def view_thread(thread_id):
+    thread = ub.session.query(ub.Thread).get(thread_id)
+    if not thread:
+        flash('Thread not found!', 'danger')
+        return redirect(url_for('manage_threads'))
+    posts = ub.session.query(ub.Post).filter_by(thread_id=thread_id).all()
+    return render_title_template(
+        'view_thread.html',
+        thread=thread,
+        posts=posts,
+        title=thread.title,
+        page='forum'
     )
 
 # Gestión de Publicaciones
@@ -1560,27 +1607,38 @@ def manage_posts():
         page='forum'
     )
     
-@app.route('/posts/add', methods=['GET', 'POST'])
+@app.route('/posts/add/<int:thread_id>', methods=['GET', 'POST'])
 @login_required
-def add_post():
+def add_post(thread_id):
+    thread = ub.session.query(ub.Thread).get(thread_id)
+    if not thread:
+        flash('Thread not found!', 'danger')
+        return redirect(url_for('manage_threads'))
+
     if request.method == 'POST':
         content = request.form['content']
-        thread_id = request.form['thread_id']
-        user_id = request.form['user_id']
+        #anonymous = request.form.get('anonymous')
+
+        user_id = current_user.id
+        '''# Determina el user_id basado en la opción seleccionada
+        if anonymous == 'user':
+            user_id = current_user.id
+        else:
+            user_id = None  # Manejo del caso anónimo, ajusta si es necesario
+'''
         post = ub.Post(content=content, thread_id=thread_id, user_id=user_id)
         ub.session.add(post)
         ub.session.commit()
         flash('Post added successfully!', 'success')
-        return redirect(url_for('manage_posts'))
-    threads = ub.session.query(ub.Thread).all()
-    users = ub.session.query(ub.User).all()
+        return redirect(url_for('view_thread', thread_id=thread_id))
+    
     return render_title_template(
         'add_post.html',
-        threads=threads,
-        users=users,
+        thread=thread,
         title="Posts",
-        page = 'forum'
+        page='forum'
     )
+
 ################################ NUEVO foro ################################
 
 

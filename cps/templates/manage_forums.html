@@ -17,10 +17,9 @@
         <tbody>
             {% for forum in forums %}
                 <tr>
-                    <td>{{ forum.name }}</td>
+                    <td><a href="{{ url_for('view_forum', forum_id=forum.id) }}">{{ forum.name }}</a></td>
                     <td>{{ forum.description }}</td>
                     <td>{{ forum.category.name }}</td>
-                    
                 </tr>
             {% endfor %}
         </tbody>

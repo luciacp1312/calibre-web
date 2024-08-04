@@ -15,20 +15,12 @@
             <label for="forum_id">Foro:</label>
             <select class="form-control" id="forum_id" name="forum_id" required>
                 {% for forum in forums %}
-                <option value="{{ forum.id }}">{{ forum.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="user_id">Usuario:</label>
-            <select class="form-control" id="user_id" name="user_id" required>
-                {% for user in users %}
-                <option value="{{ user.id }}">{{ user.name }}</option>
+                <option value="{{ forum.id }}" {% if forum.id == forum_id %}selected{% endif %}>{{ forum.name }}</option>
                 {% endfor %}
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Agregar Hilo</button>
     </form>
-    <a href="{{ url_for('manage_threads') }}" class="btn btn-secondary mt-3">Volver a Hilos</a>
+    <a href="{{ url_for('view_forum', forum_id=forum_id) }}" class="btn btn-secondary mt-3">Volver a Foros</a>
 </div>
 {% endblock %}
