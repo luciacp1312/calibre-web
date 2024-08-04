@@ -6,6 +6,7 @@
 <div class="container mt-5">
     <h2>Agregar Hilo</h2>
     <form method="post" action="{{ url_for('add_thread') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="title">Título:</label>
             <input type="text" class="form-control" id="title" name="title" required>

@@ -6,6 +6,7 @@
 <div class="container mt-5">
     <h2>Agregar Foro</h2>
     <form method="post" action="{{ url_for('add_forum') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="name">Nombre:</label>
             <input type="text" class="form-control" id="name" name="name" required>

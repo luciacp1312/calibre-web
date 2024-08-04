@@ -6,6 +6,7 @@
 <div class="container mt-5">
     <h2>Agregar Publicación</h2>
     <form method="post" action="{{ url_for('add_post') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="content">Contenido:</label>
             <textarea class="form-control" id="content" name="content" required></textarea>

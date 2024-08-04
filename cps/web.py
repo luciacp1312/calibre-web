@@ -53,6 +53,7 @@ from flask import jsonify
 import zipfile
 from .recomendador import *
 from cps.db import Answer
+from cps.ub import ForumCategory, Forum, Thread, Post
 from .helper import get_epub_path
 ############################### NUEVO ###############################
 
@@ -1273,8 +1274,7 @@ def render_recomendador(page, book_id=None, order=['default', 'order'], result=N
         result=result,
         title=_("Recomendador"),
         page="recomendador",
-        order=order[1],
-        #instance="Calibre-Web"
+        order=order[1]
     )
     #else:
         #abort(404)
@@ -1451,19 +1451,32 @@ def manage_categories():
 @login_required
 def add_category():
     if request.method == 'POST':
-        name = request.form['name']
-        description = request.form['description']
+        name = request.form.get('name')
+        description = request.form.get('description', '')
+
+        # Verificar que se están recibiendo los datos
+        app.logger.info(f"Received name: {name}, description: {description}")
+
+        if not name:
+            flash('Name is required!', 'danger')
+            return redirect(url_for('add_category'))
+
+        try:
+            category = ub.ForumCategory(name=name, description=description)
+            ub.session.add(category)
+            ub.session.commit()
+            app.logger.info(f"Category added successfully: {category}")
+            flash('Category added successfully!', 'success')
+        except Exception as e:
+            # Registrar el error en los logs
+            app.logger.error(f"Error adding category: {e}")
+            flash('There was an error adding the category. Please try again.', 'danger')
+            return redirect(url_for('add_category'))
         
-        category = ub.ForumCategory(name=name, description=description)
-        ub.session.add(category)
-        ub.session.commit()
-        flash('Category added successfully!', 'success')
-        return redirect(url_for('manage_categories'))
-    return render_title_template(
-        'add_category.html',
-        title="Categories",
-        page = 'forum'
-    )
+        return redirect(url_for('manage_forums'))  # Redirigir a /forums después de agregar la categoría
+
+    return render_template('add_category.html', title="Categories", page='forum')
+
 
 # Gestión de foros
 @app.route('/forums')
@@ -1481,9 +1494,13 @@ def manage_forums():
 @login_required
 def add_forum():
     if request.method == 'POST':
-        name = request.form['name']
-        description = request.form['description']
-        category_id = request.form['category_id']
+        name = request.form.get('name')
+        description = request.form.get('description', '')
+        category_id = request.form.get('category_id') # CREO QUE ES Category_name no el id
+        category_id = int(category_id)
+        #name = request.form['name']
+        #description = request.form['description']
+        #category_id = request.form['category_id']
         forum = ub.Forum(name=name, description=description, category_id=category_id)
         ub.session.add(forum)
         ub.session.commit()
