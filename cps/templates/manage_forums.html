@@ -11,7 +11,9 @@
                 <th><a href="{{ url_for('manage_forums', order='name') }}">Name</a></th>
                 <th><a href="{{ url_for('manage_forums', order='description') }}">Description</a></th>
                 <th><a href="{{ url_for('manage_forums', order='category_id') }}">Category</a></th>
+                {% if current_user.role_admin() %}
                 <th>Actions</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -20,6 +22,14 @@
                     <td><a href="{{ url_for('view_forum', forum_id=forum.id) }}">{{ forum.name }}</a></td>
                     <td>{{ forum.description }}</td>
                     <td>{{ forum.category.name }}</td>
+                    {% if current_user.role_admin() %}
+                    <td>
+                        <form action="{{ url_for('delete_forum', forum_id=forum.id) }}" method="post" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this forum?')">Delete</button>
+                        </form>
+                    </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>

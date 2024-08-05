@@ -3,14 +3,16 @@
 {% block body %}
 <div class="container">
     <h1>{{ title }}</h1>
-    <a href="{{ url_for('add_thread') }}" class="btn btn-primary">Add Thread</a>
+    <a href="{{ url_for('add_thread', forum_id=forum.id) }}" class="btn btn-primary">Add Thread</a>
     <table class="table">
         <thead>
             <tr>
                 <th>Title</th>
                 <th>Forum</th>
                 <th>User</th>
+                {% if current_user.role_admin() %}
                 <th>Actions</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -19,9 +21,14 @@
                     <td>{{ thread.title }}</td>
                     <td>{{ thread.forum.name }}</td>
                     <td>{{ thread.user.username }}</td>
+                    {% if current_user.role_admin() %}
                     <td>
-                        <!-- Actions like Edit/Delete could go here -->
+                        <form action="{{ url_for('delete_thread', thread_id=thread.id) }}" method="post" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this thread?')">Delete</button>
+                        </form>
                     </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>

@@ -1435,6 +1435,113 @@ def get_book_info(isbn=None, title=None):
 #################################### NUEVO buscar libro recomendador ####################################
 
 ################################ NUEVO foro ################################
+
+# Ruta para eliminar un foro
+@app.route('/forums/delete/<int:forum_id>', methods=['POST'])
+@login_required
+def delete_forum(forum_id):
+    app.logger.debug(f"Attempting to delete forum with ID {forum_id}")
+
+    if not current_user.role_admin():
+        flash('Unauthorized access!', 'danger')
+        return redirect(url_for('manage_forums'))
+    
+    forum = ub.session.query(ub.Forum).get(forum_id)
+    if not forum:
+        flash('Forum not found!', 'danger')
+        return redirect(url_for('manage_forums'))
+    
+    try:
+        ub.session.delete(forum)
+        ub.session.commit()
+        flash('Forum deleted successfully!', 'success')
+    except Exception as e:
+        ub.session.rollback()
+        app.logger.error(f"Error deleting forum: {e}")
+        flash('There was an error deleting the forum. Please try again.', 'danger')
+    
+    return redirect(url_for('manage_forums'))
+
+# Ruta para eliminar un hilo
+@app.route('/threads/delete/<int:thread_id>', methods=['POST'])
+@login_required
+def delete_thread(thread_id):
+    if not current_user.role_admin():
+        flash('You do not have permission to delete threads.', 'danger')
+        return redirect(url_for('view_forum'))
+    
+    thread = ub.session.query(ub.Thread).get(thread_id)
+    if not thread:
+        flash('Thread not found!', 'danger')
+        return redirect(url_for('view_forum'))
+    
+    try:
+        # Eliminar todos los posts asociados con el thread
+        posts = ub.session.query(ub.Post).filter_by(thread_id=thread_id).all()
+        for post in posts:
+            ub.session.delete(post)
+        
+        # Eliminar el thread
+        ub.session.delete(thread)
+        ub.session.commit()
+        flash('Thread and its posts deleted successfully!', 'success')
+    except Exception as e:
+        ub.session.rollback()
+        app.logger.error(f"Error deleting thread: {e}")
+        flash('There was an error deleting the thread. Please try again.', 'danger')
+    
+    return redirect(url_for('view_forum', forum_id=thread.forum_id))
+
+# Ruta para eliminar una publicación
+@app.route('/posts/delete/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    if not current_user.role_admin():
+        flash('Unauthorized access!', 'danger')
+        return redirect(url_for('manage_posts'))
+    
+    post = ub.session.query(ub.Post).get(post_id)
+    if not post:
+        flash('Post not found!', 'danger')
+        return redirect(url_for('manage_posts'))
+    
+    thread_id = post.thread_id
+    try:
+        ub.session.delete(post)
+        ub.session.commit()
+        flash('Post deleted successfully!', 'success')
+    except Exception as e:
+        ub.session.rollback()
+        app.logger.error(f"Error deleting post: {e}")
+        flash('There was an error deleting the post. Please try again.', 'danger')
+    
+    #return redirect(url_for('manage_posts')) #, thread_id=post.thread_id
+    return redirect(url_for('view_thread', thread_id=thread_id)) #, thread_id=post.thread_id
+
+# Ruta para eliminar una categoría
+@app.route('/categories/delete/<int:category_id>', methods=['POST'])
+@login_required
+def delete_category(category_id):
+    if not current_user.role_admin():
+        flash('Unauthorized access!', 'danger')
+        return redirect(url_for('manage_categories'))
+    
+    category = ub.session.query(ub.ForumCategory).get(category_id)
+    if not category:
+        flash('Category not found!', 'danger')
+        return redirect(url_for('manage_categories'))
+    
+    try:
+        ub.session.delete(category)
+        ub.session.commit()
+        flash('Category deleted successfully!', 'success')
+    except Exception as e:
+        ub.session.rollback()
+        app.logger.error(f"Error deleting category: {e}")
+        flash('There was an error deleting the category. Please try again.', 'danger')
+    
+    return redirect(url_for('manage_categories'))
+
 # Gestión de categorías
 @app.route('/categories')
 @login_required
@@ -1527,6 +1634,7 @@ def view_forum(forum_id):
         'view_forum.html',
         forum=forum,
         threads=threads,
+        #forum_id=forum_id,
         title=forum.name,
         page='forum'
     )
@@ -1544,35 +1652,38 @@ def manage_threads():
         page='forum'
     )
     
-@app.route('/threads/add', methods=['GET', 'POST'])
+#@app.route('/threads/add', methods=['GET', 'POST'])
+@app.route('/forums/<int:forum_id>/threads/add', methods=['GET', 'POST'])
 @login_required
-def add_thread():
-    forum_id = request.args.get('forum_id', None)
+def add_thread(forum_id):
+    #forum_id = request.args.get('forum_id', None)
+    forum = ub.session.query(ub.Forum).get(forum_id)
+    if not forum:
+        flash('Forum not found!', 'danger')
+        return redirect(url_for('manage_forums'))
+    
     if request.method == 'POST':
         title = request.form['title']
-        forum_id = request.form['forum_id']
-        #user_id = request.form['user_id']
-        #anonymous = request.form.get('anonymous')
-        
-        user_id = current_user.id
-        '''# Definir el user_id dependiendo de la opción seleccionada
-        if anonymous == 'user':
-            user_id = current_user.id
-        else:
-            user_id = None  # O algún valor que indique "anónimo", si es necesario en tu lógica
-        '''
-        
+        content = request.form['content']
+        user_id = current_user.id        
         
         thread = ub.Thread(title=title, forum_id=forum_id, user_id=user_id)
         ub.session.add(thread)
         ub.session.commit()
-        flash('Thread added successfully!', 'success')
+        
+        post = ub.Post(content=content, thread_id=thread.id, user_id=user_id)
+        ub.session.add(post)
+        ub.session.commit()
+        
+        flash('Thread and post added successfully!', 'success')
         return redirect(url_for('view_forum', forum_id=forum_id))
-    forums = ub.session.query(ub.Forum).all()
-    #users = ub.session.query(ub.User).all()
+    
+    #forums = ub.session.query(ub.Forum).all()
+    
     return render_title_template(
         'add_thread.html',
-        forums=forums,
+        #forums=forums,
+        forum=forum,
         forum_id=forum_id,
         title="Threads",
         page = 'forum'
@@ -1585,8 +1696,9 @@ def view_thread(thread_id):
     thread = ub.session.query(ub.Thread).get(thread_id)
     if not thread:
         flash('Thread not found!', 'danger')
-        return redirect(url_for('manage_threads'))
-    posts = ub.session.query(ub.Post).filter_by(thread_id=thread_id).all()
+        return redirect(url_for('view_forum'))
+    posts = ub.session.query(ub.Post).filter_by(thread_id=thread_id).order_by(ub.Post.created_at).all()
+    
     return render_title_template(
         'view_thread.html',
         thread=thread,
@@ -1623,7 +1735,7 @@ def add_post(thread_id):
     thread = ub.session.query(ub.Thread).get(thread_id)
     if not thread:
         flash('Thread not found!', 'danger')
-        return redirect(url_for('manage_threads'))
+        return redirect(url_for('view_forum'))
 
     if request.method == 'POST':
         content = request.form['content']

@@ -287,7 +287,7 @@ class Thread(Base):
     forum = relationship('Forum', back_populates='threads')
     user = relationship('User', back_populates='threads')
     # Relación con posts
-    posts = relationship('Post', order_by='Post.id', back_populates='thread')
+    posts = relationship('Post', order_by='Post.created_at', back_populates='thread', cascade='all, delete-orphan')
 
 Forum.threads = relationship('Thread', order_by=Thread.id, back_populates='forum')
 User.threads = relationship('Thread', order_by=Thread.id, back_populates='user')

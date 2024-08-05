@@ -5,22 +5,18 @@
 {% block body %}
 <div class="container mt-5">
     <h2>Agregar Hilo</h2>
-    <form method="post" action="{{ url_for('add_thread') }}">
+    <form method="post" action="{{ url_for('add_thread', forum_id=forum.id) }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="title">Título:</label>
             <input type="text" class="form-control" id="title" name="title" required>
         </div>
         <div class="form-group">
-            <label for="forum_id">Foro:</label>
-            <select class="form-control" id="forum_id" name="forum_id" required>
-                {% for forum in forums %}
-                <option value="{{ forum.id }}" {% if forum.id == forum_id %}selected{% endif %}>{{ forum.name }}</option>
-                {% endfor %}
-            </select>
+            <label for="content">Contenido del Primer Post:</label>
+            <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Agregar Hilo</button>
     </form>
-    <a href="{{ url_for('view_forum', forum_id=forum_id) }}" class="btn btn-secondary mt-3">Volver a Foros</a>
+    <a href="{{ url_for('view_forum', forum_id=forum.id) }}" class="btn btn-secondary mt-3">Volver a Foros</a>
 </div>
 {% endblock %}
