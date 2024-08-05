@@ -1596,13 +1596,23 @@ def view_thread(thread_id):
     )
 
 # Gestión de Publicaciones
-@app.route('/posts')
+#@app.route('/posts')
+@app.route('/posts', defaults={'thread_id': None})
+@app.route('/posts/<int:thread_id>')
 @login_required
-def manage_posts():
-    posts = ub.session.query(ub.Post).all()
+def manage_posts(thread_id):
+    #posts = ub.session.query(ub.Post).all()
+    #thread_id = ub.session.query(ub.Thread).get(thread_id)
+    posts_query = ub.session.query(ub.Post)
+    
+    if thread_id:
+        posts_query = posts_query.filter_by(thread_id=thread_id)
+    
+    posts = posts_query.all()
     return render_title_template(
         'manage_posts.html',
         posts=posts,
+        thread_id=thread_id,
         title="Posts",
         page='forum'
     )
@@ -1620,12 +1630,6 @@ def add_post(thread_id):
         #anonymous = request.form.get('anonymous')
 
         user_id = current_user.id
-        '''# Determina el user_id basado en la opción seleccionada
-        if anonymous == 'user':
-            user_id = current_user.id
-        else:
-            user_id = None  # Manejo del caso anónimo, ajusta si es necesario
-'''
         post = ub.Post(content=content, thread_id=thread_id, user_id=user_id)
         ub.session.add(post)
         ub.session.commit()

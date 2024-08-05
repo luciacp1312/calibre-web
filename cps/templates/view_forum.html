@@ -5,6 +5,7 @@
     <h1>{{ forum.name }}</h1>
     <p>{{ forum.description }}</p>
     <a href="{{ url_for('add_thread', forum_id=forum.id) }}" class="btn btn-primary">Add Thread</a>
+    <a href="{{ url_for('manage_forums') }}" class="btn btn-secondary mt-3">Back to Forums</a> <!-- Enlace añadido aquí -->
     <table class="table">
         <thead>
             <tr>

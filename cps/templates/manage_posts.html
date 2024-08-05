@@ -3,7 +3,17 @@
 {% block body %}
 <div class="container">
     <h1>{{ title }}</h1>
-    <a href="{{ url_for('add_post') }}" class="btn btn-primary">Add Post</a>
+    
+    {% if thread_id %}
+        <a href="{{ url_for('view_thread', thread_id=thread_id) }}" class="btn btn-secondary mt-3">Back to Thread</a>
+    {% endif %}
+    
+    {% if thread_id %}
+        <a href="{{ url_for('add_post', thread_id=thread_id) }}" class="btn btn-primary">Add Post</a>
+    {% else %}
+        <a href="{{ url_for('add_post', thread_id=0) }}" class="btn btn-primary">Add Post</a> <!-- Placeholder value -->
+    {% endif %}
+
     <table class="table">
         <thead>
             <tr>

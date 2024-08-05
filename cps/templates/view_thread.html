@@ -5,6 +5,7 @@
     <h1>{{ thread.title }}</h1>
     <p>Started by {{ thread.user.username }} on {{ thread.created_at }}</p>
     <a href="{{ url_for('add_post', thread_id=thread.id) }}" class="btn btn-primary">Add Post</a>
+    <a href="{{ url_for('view_forum', forum_id=thread.forum.id) }}" class="btn btn-secondary mt-3">Back to Forum</a> <!-- Enlace añadido aquí -->
     <table class="table">
         <thead>
             <tr>
