@@ -27,7 +27,7 @@
                 <tr>
                     <td>{{ post.content }}</td>
                     <td>{{ post.thread.title }}</td>
-                    <td>{{ post.user.username }}</td>
+                    <td>{{ post.user.name }}</td>
                     {% if current_user.role_admin() %}
                     <td>
                         <form action="{{ url_for('delete_post', post_id=post.id) }}" method="post" style="display:inline;">

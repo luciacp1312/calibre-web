@@ -3,15 +3,14 @@
 {% block body %}
 <div class="container">
     <h1>{{ title }}</h1>
+    {% if current_user.role_admin() %}
     <a href="{{ url_for('add_category') }}" class="btn btn-primary">Add Category</a>
-    <table class="table">
+    <table class="table mt-3">
         <thead>
             <tr>
                 <th><a href="{{ url_for('manage_categories', order='name') }}">Name</a></th>
                 <th><a href="{{ url_for('manage_categories', order='description') }}">Description</a></th>
-                {% if current_user.role_admin() %}
                 <th>Actions</th>
-                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -19,17 +18,17 @@
                 <tr>
                     <td>{{ category.name }}</td>
                     <td>{{ category.description }}</td>
-                    {% if current_user.role_admin() %}
                     <td>
                         <form action="{{ url_for('delete_category', category_id=category.id) }}" method="post" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this category?')">Delete</button>
                         </form>
                     </td>
-                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    {% endif %}
+    <a href="{{ url_for('manage_forums') }}" class="btn btn-secondary mt-3">Volver a Foros</a>
 </div>
 {% endblock %}

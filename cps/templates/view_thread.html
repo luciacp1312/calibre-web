@@ -3,14 +3,12 @@
 {% block body %}
 <div class="container">
     <h1>{{ thread.title }}</h1>
-    <p>Started by {{ thread.user.username }} on {{ thread.created_at }}</p>
-    <a href="{{ url_for('add_post', thread_id=thread.id) }}" class="btn btn-primary">Responder</a>
     <a href="{{ url_for('view_forum', forum_id=thread.forum.id) }}" class="btn btn-secondary mt-3">Volver al Foro</a>
     <div class="posts">
         {% for post in posts %}
         <div class="post-box">
             <div class="post-header">
-                <strong>{{ post.user.username }}</strong> - {{ post.created_at }}
+                <strong>{{ post.user.name }}</strong> - {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
             </div>
             <div class="post-content">
                 <p>{{ post.content }}</p>
@@ -22,6 +20,7 @@
                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this post?')">Delete</button>
                 </form>
                 {% endif %}
+                <!-- Botón "Responder" para contestar a cada comentario individualmente -->
                 <a href="{{ url_for('add_post', thread_id=thread.id) }}" class="btn btn-secondary btn-sm">Responder</a>
             </div>
         </div>
@@ -36,8 +35,11 @@
     border-radius: 5px;
 }
 .post-header {
-    font-weight: bold;
+    font-weight: normal;
     margin-bottom: 10px;
+}
+.post-header strong {
+    font-weight: bold; /* Ensure the username is bold */
 }
 </style>
 {% endblock %}

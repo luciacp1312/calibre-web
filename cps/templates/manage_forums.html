@@ -5,7 +5,10 @@
     <h1>{{ title }}</h1>
     <a href="{{ url_for('add_forum') }}" class="btn btn-primary">Add Forum</a>
     <a href="{{ url_for('add_category') }}" class="btn btn-primary">Add Category</a>
-    <table class="table">
+    {% if current_user.role_admin() %}
+    <a href="{{ url_for('manage_categories') }}" class="btn btn-danger ml-2">Delete Category</a>
+    {% endif %}
+    <table class="table mt-3">
         <thead>
             <tr>
                 <th><a href="{{ url_for('manage_forums', order='name') }}">Name</a></th>
