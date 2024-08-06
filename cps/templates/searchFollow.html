@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Buscar Usuarios{% endblock %}
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="text-center mb-4">Buscar Usuarios</h2>
+            <form action="{{ url_for('search') }}" method="get" class="mb-4">
+                <input type="text" name="q" placeholder="Buscar..." value="{{ query }}" class="form-control">
+                <button type="submit" class="btn btn-primary mt-2">Buscar</button>
+            </form>
+            <ul>
+                {% for user in users %}
+                    <li>
+                        <a href="{{ url_for('user_profile', username=user.name) }}">{{ user.name }}</a>
+                        {% if current_user.is_following(user) %}
+                            <a href="{{ url_for('unfollow', username=user.name) }}">Dejar de seguir</a>
+                        {% else %}
+                            <a href="{{ url_for('follow', username=user.name) }}">Seguir</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

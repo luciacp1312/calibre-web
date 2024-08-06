@@ -62,6 +62,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import constants, logger, isoLanguages, services
 from . import db, ub, config, app
+from cps.db import CalibreDB
 from . import calibre_db, kobo_sync_status
 from .search import render_search_results, render_adv_search_results
 from .gdriveutils import getFileFromEbooksFolder, do_gdrive_download
@@ -1523,8 +1524,7 @@ def delete_post(post_id):
         ub.session.rollback()
         flash('There was an error deleting the post. Please try again.', 'danger')
     
-    #return redirect(url_for('manage_posts')) #, thread_id=post.thread_id
-    return redirect(url_for('view_thread', thread_id=thread_id)) #, thread_id=post.thread_id
+    return redirect(url_for('view_thread', thread_id=thread_id))
 
 @app.route('/categories/create_default', methods=['POST'])
 @login_required
@@ -1793,6 +1793,91 @@ def add_post(thread_id):
 
 ################################ NUEVO foro ################################
 
+################################ NUEVO red social ################################
+@app.route('/follow/<username>')
+@login_required
+def follow(username):
+    user = ub.session.query(ub.User).filter(ub.User.name==username).first()
+    if user is None:
+        flash('User {} not found.'.format(username))
+        return redirect(url_for('web.index'))
+    if user == current_user:
+        flash('You cannot follow yourself!')
+        return redirect(url_for('user_profile', username=username))
+        #return redirect(url_for('web.index', username=username))
+    current_user.follow(user)
+    db.session.commit()
+    flash('You are now following {}!'.format(username))
+    return redirect(url_for('user_profile', username=username))
+    #return redirect(url_for('web.index', username=username))
+
+@app.route('/unfollow/<username>')
+@login_required
+def unfollow(username):
+    #user = ub.User.query.filter_by(name=username).first()
+    user = ub.session.query(ub.User).filter(ub.User.name==username).first()
+    if user is None:
+        flash('User {} not found.'.format(username))
+        return redirect(url_for('web.index'))
+    if user == current_user:
+        flash('You cannot unfollow yourself!')
+        return redirect(url_for('user_profile', username=username))
+        #return redirect(url_for('web.index', username=username))
+    current_user.unfollow(user)
+    db.session.commit()
+    flash('You have unfollowed {}.'.format(username))
+    return redirect(url_for('user_profile', username=username))
+    #return redirect(url_for('web.index', username=username))
+
+@app.route('/following')
+@login_required
+def following():
+    users = ub.session.query(ub.User).filter(ub.User.id.in_(current_user.following_associations)).all()
+    #users = current_user.following.all()
+    return render_template('following.html', users=users)
+
+@app.route('/search', methods=['GET'])
+@login_required
+def search():
+    query = request.args.get('q', '')
+    if query:
+        users = ub.session.query(ub.User).filter(ub.User.name.like(f'{query}%')).all()
+        #users = ub.User.query.filter(ub.User.name.like(f'{query}%')).all()
+    else:
+        users = []
+    return render_template('searchFollow.html', users=users, query=query)
+
+
+@app.route('/user/<username>')
+@login_required
+def user_profile(username):
+    user = ub.session.query(ub.User).filter(ub.User.name==username).first()
+    if user is None:
+        abort(404)
+    downloads = ub.session.query(ub.Downloads).filter(ub.Downloads.user_id==user.id).all()
+    shelves = ub.session.query(ub.Shelf).filter(ub.Shelf.user_id==user.id).all()
+    threads = ub.session.query(ub.Thread).filter(ub.Thread.user_id==user.id).all()
+    
+    books_dict = {}
+    for download in downloads:
+        book_id = download.book_id
+        book = calibre_db.get_book(book_id)
+        if book:
+            cover_url = url_for('web.get_cover', book_id=book_id, resolution='md')
+            #cover_url = get_book_cover(book_id)
+            #books_dict[book_id] = book
+            books_dict[book_id] = {
+                'book': book,
+                'cover_url': cover_url
+            }
+
+    return render_template(
+        'user_profile.html',
+        user=user, downloads=downloads, books=books_dict, shelves=shelves, threads=threads, current_user=current_user,
+        title="Profile",
+        page='profile')
+
+################################ NUEVO red social ################################
 
 #################################### NUEVO audio ####################################
 def extract_text_from_epub(epub_path):

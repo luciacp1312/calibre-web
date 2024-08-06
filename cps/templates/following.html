@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}Usuarios que sigues{% endblock %}
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="text-center mb-4">Usuarios que sigues</h2>
+            <ul>
+                {% for user in users %}
+                    <li>
+                        <a href="{{ url_for('user_profile', username=user.name) }}">{{ user.name }}</a>
+                        <a href="{{ url_for('unfollow', username=user.name) }}">Dejar de seguir</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

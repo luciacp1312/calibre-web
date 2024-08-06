@@ -105,7 +105,7 @@ def get_sidebar_config(kwargs=None):
     #print(f"Visibilidad del recomendador: {current_user.check_visibility(constants.SIDEBAR_RECOMMENDER)}")
     #print("Sidebar Configuración:", sidebar)
     sidebar.append(
-        {"glyph": "glyphicon-thumbs-up", "text": _('Recomendador'), "link": 'web.recomendador', "id": "recomendador",
+        {"glyph": "glyphicon-thumbs-up", "text": _('Recomendador'), "link": 'recomendador', "id": "recomendador",
          "visibility": constants.SIDEBAR_RECOMMENDER, 'public': True, "page": "recomendador",
          "show_text": _('Show Recommender'), "config_show": True})
     #################################### NUEVO recomendador ####################################

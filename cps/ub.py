@@ -41,7 +41,7 @@ except ImportError as e:
         OAuthConsumerMixin = BaseException
         oauth_support = False
 from sqlalchemy import TIMESTAMP, create_engine, exc, exists, event, text
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy import String, Integer, SmallInteger, Boolean, DateTime, Float, JSON
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.sql.expression import func
@@ -222,7 +222,19 @@ class UserBase:
     def __repr__(self):
         return '<User %r>' % self.name
 
+#################################### NUEVO red social ####################################
+# Clase de seguimiento de usuarios
+class UserFollow(Base):
+    __tablename__ = 'user_follows'
+    follower_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    followed_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    follower = relationship('User', foreign_keys=[follower_id], back_populates='following_associations')
+    #followed = relationship('User', foreign_keys=[followed_id], back_populates='follower_associations')
+    #follower = relationship('User', foreign_keys=[follower_id], backref=backref('following_associations', cascade='all, delete-orphan'))
+    #followed = relationship('User', foreign_keys=[followed_id], backref=backref('follower_associations', cascade='all, delete-orphan'))
 
+#################################### NUEVO red social ####################################
+    
 # Baseclass for Users in Calibre-Web, settings which are depending on certain users are stored here. It is derived from
 # User Base (all access methods are declared there)
 class User(UserBase, Base):
@@ -255,6 +267,31 @@ class User(UserBase, Base):
     threads = relationship('db.Thread', order_by='Thread.id', back_populates='user')
     posts = relationship('db.Post', order_by='Post.id', back_populates='user')
     #################################### NUEVO foro relaciones ####################################
+    #################################### NUEVO red social ####################################
+    following_associations = relationship('UserFollow', foreign_keys='UserFollow.follower_id', back_populates='follower', cascade='all, delete-orphan', overlaps="follower,following")
+    #follower_associations = relationship('UserFollow', foreign_keys='UserFollow.followed_id', back_populates='followed', cascade='all, delete-orphan', overlaps="followed,followers")
+    
+    #following = relationship('User', secondary='user_follows', primaryjoin='User.id==UserFollow.follower_id', secondaryjoin='User.id==UserFollow.followed_id', overlaps="follower,following_associations,followers")
+    #followers = relationship('User', secondary='user_follows', primaryjoin='User.id==UserFollow.followed_id', secondaryjoin='User.id==UserFollow.follower_id', overlaps="followed,follower_associations,following")
+
+    def follow(self, user):
+        if not self.is_following(user):
+            follow = UserFollow(follower_id=self.id, followed_id=user.id)
+            session.add(follow)
+
+    def unfollow(self, user):
+        if self.is_following(user):
+            #session.query(UserFollow).filter(follower_id==self.id, followed_id==user.id).delete()
+            UserFollow.query.filter_by(
+                follower_id=self.id,
+                followed_id=user.id).delete()
+
+    def is_following(self, user):
+        #return session.query(UserFollow).filter(follower_id==self.id, followed_id==user.id).count() > 0
+        return UserFollow.query.filter(
+            UserFollow.follower_id == self.id,
+            UserFollow.followed_id == user.id).count() > 0
+#################################### NUEVO red social ####################################
     
 ############################## NUEVO foro ################################
 class ForumCategory(Base):
