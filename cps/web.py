@@ -1845,18 +1845,20 @@ def search():
         #users = ub.User.query.filter(ub.User.name.like(f'{query}%')).all()
     else:
         users = []
-    return render_template('searchFollow.html', users=users, query=query)
+    return render_template('searchFollow.html', users=users, query=query,
+        title="Profile",
+        page='profile')
 
 
 @app.route('/user/<username>')
 @login_required
 def user_profile(username):
-    user = ub.session.query(ub.User).filter(ub.User.name==username).first()
+    user = ub.session.query(ub.User).filter(ub.User.name == username).first()
     if user is None:
         abort(404)
-    downloads = ub.session.query(ub.Downloads).filter(ub.Downloads.user_id==user.id).all()
-    shelves = ub.session.query(ub.Shelf).filter(ub.Shelf.user_id==user.id).all()
-    threads = ub.session.query(ub.Thread).filter(ub.Thread.user_id==user.id).all()
+    downloads = ub.session.query(ub.Downloads).filter(ub.Downloads.user_id == user.id).all()
+    shelves = ub.session.query(ub.Shelf).filter(ub.Shelf.user_id == user.id).all()
+    threads = ub.session.query(ub.Thread).filter(ub.Thread.user_id == user.id).all()
     
     books_dict = {}
     for download in downloads:
@@ -1864,8 +1866,6 @@ def user_profile(username):
         book = calibre_db.get_book(book_id)
         if book:
             cover_url = url_for('web.get_cover', book_id=book_id, resolution='md')
-            #cover_url = get_book_cover(book_id)
-            #books_dict[book_id] = book
             books_dict[book_id] = {
                 'book': book,
                 'cover_url': cover_url
@@ -1875,7 +1875,8 @@ def user_profile(username):
         'user_profile.html',
         user=user, downloads=downloads, books=books_dict, shelves=shelves, threads=threads, current_user=current_user,
         title="Profile",
-        page='profile')
+        page='profile'
+    )
 
 ################################ NUEVO red social ################################
 

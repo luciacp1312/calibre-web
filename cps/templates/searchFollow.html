@@ -12,12 +12,9 @@
             <ul>
                 {% for user in users %}
                     <li>
-                        <a href="{{ url_for('user_profile', username=user.name) }}">{{ user.name }}</a>
-                        {% if current_user.is_following(user) %}
-                            <a href="{{ url_for('unfollow', username=user.name) }}">Dejar de seguir</a>
-                        {% else %}
-                            <a href="{{ url_for('follow', username=user.name) }}">Seguir</a>
-                        {% endif %}
+                        <a href="{{ url_for('user_profile', username=user.name) }}" style="font-weight: bold; font-size: 1.2em;">
+                            {{ user.name }}
+                        </a>
                     </li>
                 {% endfor %}
             </ul>
