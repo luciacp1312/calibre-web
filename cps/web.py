@@ -1794,47 +1794,52 @@ def add_post(thread_id):
 ################################ NUEVO foro ################################
 
 ################################ NUEVO red social ################################
-@app.route('/follow/<username>')
+@app.route('/follow/<username>', methods=['GET'])
 @login_required
 def follow(username):
-    user = ub.session.query(ub.User).filter(ub.User.name==username).first()
+    user = ub.session.query(ub.User).filter(ub.User.name == username).first()
     if user is None:
         flash('User {} not found.'.format(username))
         return redirect(url_for('web.index'))
     if user == current_user:
         flash('You cannot follow yourself!')
         return redirect(url_for('user_profile', username=username))
-        #return redirect(url_for('web.index', username=username))
     current_user.follow(user)
-    db.session.commit()
+    ub.session.commit()
     flash('You are now following {}!'.format(username))
     return redirect(url_for('user_profile', username=username))
-    #return redirect(url_for('web.index', username=username))
 
-@app.route('/unfollow/<username>')
+@app.route('/unfollow/<username>', methods=['GET'])
 @login_required
 def unfollow(username):
-    #user = ub.User.query.filter_by(name=username).first()
-    user = ub.session.query(ub.User).filter(ub.User.name==username).first()
+    user = ub.session.query(ub.User).filter(ub.User.name == username).first()
     if user is None:
         flash('User {} not found.'.format(username))
         return redirect(url_for('web.index'))
     if user == current_user:
         flash('You cannot unfollow yourself!')
         return redirect(url_for('user_profile', username=username))
-        #return redirect(url_for('web.index', username=username))
     current_user.unfollow(user)
-    db.session.commit()
+    ub.session.commit()
     flash('You have unfollowed {}.'.format(username))
     return redirect(url_for('user_profile', username=username))
-    #return redirect(url_for('web.index', username=username))
+
 
 @app.route('/following')
 @login_required
 def following():
-    users = ub.session.query(ub.User).filter(ub.User.id.in_(current_user.following_associations)).all()
-    #users = current_user.following.all()
-    return render_template('following.html', users=users)
+    following_ids = [assoc.followed_id for assoc in current_user.following_associations]
+    users = ub.session.query(ub.User).filter(ub.User.id.in_(following_ids)).all()
+    return render_template('following.html', users=users, title="Following", page='following')
+
+  
+@app.route('/followers')
+@login_required
+def followers():
+    follower_ids = [assoc.follower_id for assoc in current_user.follower_associations]
+    users = ub.session.query(ub.User).filter(ub.User.id.in_(follower_ids)).all()
+    return render_template('followers.html', users=users, title="Followers", page='followers')
+
 
 @app.route('/search', methods=['GET'])
 @login_required
@@ -1842,12 +1847,9 @@ def search():
     query = request.args.get('q', '')
     if query:
         users = ub.session.query(ub.User).filter(ub.User.name.like(f'{query}%')).all()
-        #users = ub.User.query.filter(ub.User.name.like(f'{query}%')).all()
     else:
         users = []
-    return render_template('searchFollow.html', users=users, query=query,
-        title="Profile",
-        page='profile')
+    return render_template('searchFollow.html', users=users, query=query, title="Search profiles", page='search Profiles')
 
 
 @app.route('/user/<username>')
@@ -1877,7 +1879,6 @@ def user_profile(username):
         title="Profile",
         page='profile'
     )
-
 ################################ NUEVO red social ################################
 
 #################################### NUEVO audio ####################################

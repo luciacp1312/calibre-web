@@ -2,6 +2,13 @@
 {% block body %}
 <div class="discover">
   <h1>{{title}}</h1>
+  <!-- NUEVO red social -->
+  <div class="button-container text-left my-3">
+    <a href="{{ url_for('following') }}" class="btn btn-primary mx-2">Seguidos</a>
+    <a href="{{ url_for('followers') }}" class="btn btn-primary mx-2">Seguidores</a>
+    <a href="{{ url_for('search') }}" class="btn btn-primary mx-2">Buscar usuarios</a>
+  </div>
+  <!-- NUEVO red social -->
   <form role="form" method="POST" autocomplete="off">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="col-md-10 col-lg-8">

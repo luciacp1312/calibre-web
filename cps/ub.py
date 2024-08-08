@@ -272,6 +272,7 @@ class User(UserBase, Base):
     follower_associations = relationship('UserFollow', foreign_keys='UserFollow.followed_id', back_populates='followed', cascade='all, delete-orphan') #, overlaps="followed,followers"
     
     #following = relationship('User', secondary='user_follows', primaryjoin='User.id==UserFollow.follower_id', secondaryjoin='User.id==UserFollow.followed_id', overlaps="follower,following_associations,followers")
+    # OTRA FORMA PARA: following = relationship('User', secondary='user_follows', primaryjoin='User.id==UserFollow.follower_id', secondaryjoin='User.id==UserFollow.followed_id', backref='followers')
     #followers = relationship('User', secondary='user_follows', primaryjoin='User.id==UserFollow.followed_id', secondaryjoin='User.id==UserFollow.follower_id', overlaps="followed,follower_associations,following")
 
     def follow(self, user):

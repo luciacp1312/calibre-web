@@ -5,14 +5,22 @@
     <div class="row">
         <div class="col-md-8 offset-md-2">
             <h2 class="text-center mb-4">Usuarios que sigues</h2>
-            <ul>
+            <ul class="list-unstyled">
                 {% for user in users %}
-                    <li>
-                        <a href="{{ url_for('user_profile', username=user.name) }}">{{ user.name }}</a>
-                        <a href="{{ url_for('unfollow', username=user.name) }}">Dejar de seguir</a>
+                    <li class="mb-3 d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('user_profile', username=user.name) }}" style="font-weight: bold; font-size: 1.2em; flex-grow: 1;">
+                            {{ user.name }}
+                        </a>
+                        <form action="{{ url_for('unfollow', username=user.name) }}" method="get" class="mb-0">
+                            <button type="submit" class="btn btn-primary">Dejar de seguir</button>
+                        </form>
                     </li>
                 {% endfor %}
             </ul>
+            <!-- Enlace para volver al perfil -->
+            <div class="text-center mt-4">
+                <a href="{{ url_for('web.profile') }}" class="btn btn-secondary">Volver al perfil</a>
+            </div>
         </div>
     </div>
 </div>

@@ -3,12 +3,11 @@
 {% block body %}
 <style>
     .follow-button {
-        margin: 20px 0; /* 20px arriba y abajo */
+        margin: 20px 0;
         text-align: center;
     }
-    .back-to-search {
-        margin-bottom: 20px; /* 20px abajo */
-        text-align: center;
+    .books-section {
+        margin-top: 40px; /* Espacio entre el botón y los libros descargados */
     }
 </style>
 <div class="container mt-5">
@@ -19,38 +18,41 @@
             {% if current_user != user %}
                 <div class="follow-button">
                     {% if current_user.is_following(user) %}
-                        <a href="{{ url_for('unfollow', username=user.name) }}" class="btn btn-secondary">Dejar de seguir</a>
+                        <form action="{{ url_for('unfollow', username=user.name) }}" method="get" style="display:inline;">
+                            <button type="submit" class="btn btn-primary">Dejar de seguir</button>
+                        </form>
                     {% else %}
-                        <a href="{{ url_for('follow', username=user.name) }}" class="btn btn-primary">Seguir</a>
+                        <form action="{{ url_for('follow', username=user.name) }}" method="get" style="display:inline;">
+                            <button type="submit" class="btn btn-primary">Seguir</button>
+                        </form>
                     {% endif %}
                 </div>
             {% endif %}
 
-            <div class="back-to-search">
-                <a href="{{ url_for('search') }}" class="btn btn-link">Volver a Buscar Usuarios</a>
-            </div>
-
-            <h3>Libros Descargados</h3>
-            <div class="row">
-                {% for download in downloads %}
-                    {% set book_data = books[download.book_id] %}
-                    {% set book = book_data.book %}
-                    {% set cover_url = book_data.cover_url %}
-                    
-                    <div class="col-md-3 mb-4">
-                        <div class="text-center">
-                            <img src="{{ cover_url }}" alt="{{ book.title }} cover" class="img-fluid mb-2" style="max-width: 100%; height: auto;">
-                            <div class="font-weight-bold" style="font-size: 1.2em;">
-                                {{ book.title }}
+            <!-- Espacio entre el botón y la sección de libros descargados -->
+            <div class="books-section">
+                <h3>Libros Descargados</h3>
+                <div class="row">
+                    {% for download in downloads %}
+                        {% set book_data = books[download.book_id] %}
+                        {% set book = book_data.book %}
+                        {% set cover_url = book_data.cover_url %}
+                        
+                        <div class="col-md-3 mb-4">
+                            <div class="text-center">
+                                <img src="{{ cover_url }}" alt="{{ book.title }} cover" class="img-fluid mb-2" style="max-width: 100%; height: auto;">
+                                <div class="font-weight-bold" style="font-size: 1.2em;">
+                                    {{ book.title }}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {% if loop.index % 4 == 0 %}
-                        <!-- Opcional: añade un clearfix para asegurar el diseño en la fila -->
-                        <div class="w-100"></div>
-                    {% endif %}
-                {% endfor %}
+                        {% if loop.index % 4 == 0 %}
+                            <!-- Opcional: añade un clearfix para asegurar el diseño en la fila -->
+                            <div class="w-100"></div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
 
             <h3>Estanterías</h3>
