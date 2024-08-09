@@ -7,7 +7,11 @@
         text-align: center;
     }
     .books-section {
-        margin-top: 40px; /* Espacio entre el botón y los libros descargados */
+        margin-top: 40px;
+    }
+    .chat-button {
+        margin: 20px 0;
+        text-align: center;
     }
 </style>
 <div class="container mt-5">
@@ -26,6 +30,9 @@
                             <button type="submit" class="btn btn-primary">Seguir</button>
                         </form>
                     {% endif %}
+                </div>
+                <div class="chat-button">
+                    <a href="{{ url_for('chat', user_id=user.id) }}" class="btn btn-primary">Iniciar Chat</a>
                 </div>
             {% endif %}
 

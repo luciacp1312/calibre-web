@@ -1805,6 +1805,38 @@ def add_post(thread_id):
 ################################ NUEVO foro ################################
 
 ################################ NUEVO red social ################################
+@app.route('/chat/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def chat(user_id):
+    # Obtener el usuario con el que se quiere chatear
+    other_user = ub.session.query(ub.User).get(user_id)
+    if not other_user or other_user.id == current_user.id:
+        flash('Usuario no encontrado o no puedes chatear contigo mismo.', 'danger')
+        return redirect(url_for('user_profile', user_id=current_user.id))
+
+    if request.method == 'POST':
+        content = request.form.get('content')  # Usa .get() para evitar errores si 'content' no está presente
+        if content:
+            message = ub.Message(sender_id=current_user.id, receiver_id=other_user.id, content=content)
+            ub.session.add(message)
+            
+            # Crear una notificación para el receptor del mensaje
+            notification_message = f"Has recibido un mensaje de {current_user.name}"
+            notification = ub.Notification(user_id=other_user.id, message=notification_message)
+            ub.session.add(notification)
+            
+            ub.session.commit()
+            flash('Mensaje enviado!', 'success')
+            return redirect(url_for('chat', user_id=user_id))
+
+    # Obtener mensajes entre el usuario actual y el usuario con el que se chatea
+    messages = ub.session.query(ub.Message).filter(
+        ((ub.Message.sender_id == current_user.id) & (ub.Message.receiver_id == other_user.id)) |
+        ((ub.Message.sender_id == other_user.id) & (ub.Message.receiver_id == current_user.id))
+    ).order_by(ub.Message.timestamp).all()
+
+    return render_template('chat.html', user=other_user, messages=messages, title="Chat", page='chat')
+
 @app.route('/notifications')
 @login_required
 def notifications():

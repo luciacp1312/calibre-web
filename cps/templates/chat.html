@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block title %}Chat con {{ user.name }}{% endblock %}
+{% block body %}
+<style>
+    .message-container {
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+    .message {
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+    .message .username {
+        font-weight: bold;
+    }
+    .message .timestamp {
+        font-size: 0.9em;
+        color: #888;
+    }
+    .date-separator {
+        text-align: center;
+        margin: 20px 0;
+        padding: 10px;
+        border-bottom: 2px solid #b0e0e6;
+        color: #333;
+        font-weight: bold;
+    }
+</style>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Chat con {{ user.name }}</h2>
+
+    <div class="message-container">
+        {% for message in messages %}
+            {% if loop.first or (message.timestamp.date() != messages[loop.index0 - 1].timestamp.date()) %}
+                <div class="date-separator">{{ message.timestamp.strftime('%d %b %Y') }}</div>
+            {% endif %}
+            <div class="message">
+                <div class="message-header">
+                    <div class="username">{{ message.sender.name }}</div>
+                    <div class="timestamp">{{ message.timestamp.strftime('%H:%M') }}</div>
+                </div>
+                <div class="content">{{ message.content }}</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="post" class="mt-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <textarea class="form-control" name="content" rows="3" placeholder="Escribe un mensaje..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+</div>
+{% endblock %}

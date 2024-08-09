@@ -246,6 +246,21 @@ class Notification(Base):
     
     def __repr__(self):
         return f"<Notification {self.message}>"
+    
+
+class Message(Base):
+    __tablename__ = 'messages'
+    id = Column(Integer, primary_key=True)
+    sender_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    receiver_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    content = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+
+    sender = relationship('User', foreign_keys=[sender_id])
+    receiver = relationship('User', foreign_keys=[receiver_id])
+    
+    def __repr__(self):
+        return f"<Message from {self.sender.name} to {self.receiver.name} at {self.timestamp}>"
 #################################### NUEVO red social ####################################
     
 # Baseclass for Users in Calibre-Web, settings which are depending on certain users are stored here. It is derived from
