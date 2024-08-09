@@ -1,0 +1,46 @@
+<!-- notifications.html -->
+{% extends "layout.html" %}
+{% block title %}Notificaciones{% endblock %}
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="text-center mb-4">Notificaciones</h2>
+            <hr class="mb-4"> <!-- Espacio en blanco -->
+
+            <!-- Botón para eliminar las notificaciones -->
+            <div class="text-right mb-4">
+                <form action="{{ url_for('delete_all_notifications') }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar todas las notificaciones?');" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary" style="background-color: #3b83bd; border-color: #3b83bd;">Eliminar todas las notificaciones</button>
+                </form>
+            </div>
+
+            <hr class="mb-4">
+
+            <!-- Lista de notificaciones -->
+            <ul class="list-group mb-4">
+                {% for notification in notifications %}
+                    <li class="list-group-item {% if not notification.is_read %}list-group-item-info{% endif %}">
+                        <span>{{ notification.message }}</span>
+                        <span class="float-right text-muted">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+
+                        {% if notification.post_id %}
+                            <a href="{{ url_for('view_thread', thread_id=notification.post.thread_id) }}" class="btn btn-sm btn-link">Ver post</a>
+                        {% endif %}
+
+                        <form action="{{ url_for('delete_notification', notification_id=notification.id) }}" method="POST" style="display: inline; margin-left: 10px;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm" style="background-color: #3b83bd; color: white; border-color: #3b83bd;">Eliminar</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% if not notifications %}
+                <p class="text-center mt-3">No tienes notificaciones.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

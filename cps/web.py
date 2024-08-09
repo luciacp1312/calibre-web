@@ -1775,13 +1775,24 @@ def add_post(thread_id):
 
     if request.method == 'POST':
         content = request.form['content']
-        #anonymous = request.form.get('anonymous')
-
         user_id = current_user.id
         post = ub.Post(content=content, thread_id=thread_id, user_id=user_id)
         ub.session.add(post)
         ub.session.commit()
-        flash('Post added successfully!', 'success')
+        
+        # Crear notificaciones para los seguidores
+        followers = ub.session.query(ub.User).join(ub.UserFollow, ub.User.id == ub.UserFollow.follower_id).filter(ub.UserFollow.followed_id == user_id).all()
+        for follower in followers:
+            notification = ub.Notification(
+                user_id=follower.id,
+                message=f'El usuario {current_user.name} ha publicado en el foro.',
+                post_id=post.id
+            )
+            ub.session.add(notification)
+        
+        ub.session.commit()
+        
+        flash('¡Post añadido con éxito!', 'success')
         return redirect(url_for('view_thread', thread_id=thread_id))
     
     return render_title_template(
@@ -1794,6 +1805,33 @@ def add_post(thread_id):
 ################################ NUEVO foro ################################
 
 ################################ NUEVO red social ################################
+@app.route('/notifications')
+@login_required
+def notifications():
+    notifications = ub.session.query(ub.Notification).filter(ub.Notification.user_id==current_user.id).order_by(ub.Notification.timestamp.desc()).all()
+    return render_template('notifications.html', notifications=notifications, title="Notifications", page='notifications')
+
+@app.route('/notifications/delete_all', methods=['POST'])
+@login_required
+def delete_all_notifications():
+    ub.session.query(ub.Notification).filter(ub.Notification.user_id == current_user.id).delete()
+    ub.session.commit()
+    flash('Todas las notificaciones han sido eliminadas.', 'success')
+    return redirect(url_for('notifications'))
+
+
+@app.route('/notifications/delete/<int:notification_id>', methods=['POST'])
+@login_required
+def delete_notification(notification_id):
+    notification = ub.session.query(ub.Notification).filter(ub.Notification.id == notification_id, ub.Notification.user_id == current_user.id).first()
+    if notification:
+        ub.session.delete(notification)
+        ub.session.commit()
+        flash('Notificación eliminada.', 'success')
+    else:
+        flash('No se pudo eliminar la notificación.', 'danger')
+    return redirect(url_for('notifications'))
+
 @app.route('/follow/<username>', methods=['GET'])
 @login_required
 def follow(username):
@@ -1806,6 +1844,16 @@ def follow(username):
         return redirect(url_for('user_profile', username=username))
     current_user.follow(user)
     ub.session.commit()
+    
+    
+    # Crear notificación para el usuario seguido
+    notification = ub.Notification(
+        user_id=user.id,
+        message=f"{current_user.name} ha comenzado a seguirte."
+    )
+    ub.session.add(notification)
+    ub.session.commit()
+    
     flash('You are now following {}!'.format(username))
     return redirect(url_for('user_profile', username=username))
 

@@ -230,9 +230,22 @@ class UserFollow(Base):
     followed_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
     follower = relationship('User', foreign_keys=[follower_id], back_populates='following_associations')
     followed = relationship('User', foreign_keys=[followed_id], back_populates='follower_associations')
-    #follower = relationship('User', foreign_keys=[follower_id], backref=backref('following_associations', cascade='all, delete-orphan'))
-    #followed = relationship('User', foreign_keys=[followed_id], backref=backref('follower_associations', cascade='all, delete-orphan'))
 
+
+class Notification(Base):
+    __tablename__ = 'notifications'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    message = Column(String(255), nullable=False)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    is_read = Column(Boolean, default=False)
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    post = relationship('Post', back_populates='notifications')
+    
+    user = relationship('User', backref='notifications')
+    
+    def __repr__(self):
+        return f"<Notification {self.message}>"
 #################################### NUEVO red social ####################################
     
 # Baseclass for Users in Calibre-Web, settings which are depending on certain users are stored here. It is derived from
@@ -271,10 +284,6 @@ class User(UserBase, Base):
     following_associations = relationship('UserFollow', foreign_keys='UserFollow.follower_id', back_populates='follower', cascade='all, delete-orphan') #, overlaps="follower,following"
     follower_associations = relationship('UserFollow', foreign_keys='UserFollow.followed_id', back_populates='followed', cascade='all, delete-orphan') #, overlaps="followed,followers"
     
-    #following = relationship('User', secondary='user_follows', primaryjoin='User.id==UserFollow.follower_id', secondaryjoin='User.id==UserFollow.followed_id', overlaps="follower,following_associations,followers")
-    # OTRA FORMA PARA: following = relationship('User', secondary='user_follows', primaryjoin='User.id==UserFollow.follower_id', secondaryjoin='User.id==UserFollow.followed_id', backref='followers')
-    #followers = relationship('User', secondary='user_follows', primaryjoin='User.id==UserFollow.followed_id', secondaryjoin='User.id==UserFollow.follower_id', overlaps="followed,follower_associations,following")
-
     def follow(self, user):
         if not self.is_following(user):
             follow = UserFollow(follower_id=self.id, followed_id=user.id)
@@ -284,12 +293,10 @@ class User(UserBase, Base):
     def unfollow(self, user):
         if self.is_following(user):
             session.query(UserFollow).filter(UserFollow.follower_id==self.id, UserFollow.followed_id==user.id).delete()
-            #UserFollow.query.filter_by(follower_id=self.id, followed_id=user.id).delete()
             session.commit()
 
     def is_following(self, user):
         return session.query(UserFollow).filter(UserFollow.follower_id==self.id, UserFollow.followed_id==user.id).count() > 0
-        #return UserFollow.query.filter( UserFollow.follower_id == self.id, UserFollow.followed_id == user.id).count() > 0
 #################################### NUEVO red social ####################################
     
 ############################## NUEVO foro ################################
@@ -337,6 +344,7 @@ class Post(Base):
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     thread = relationship('Thread', back_populates='posts')
     user = relationship('User', back_populates='posts')
+    notifications = relationship('Notification', back_populates='post')
 
 Thread.posts = relationship('Post', order_by=Post.id, back_populates='thread')
 User.posts = relationship('Post', order_by=Post.id, back_populates='user')
