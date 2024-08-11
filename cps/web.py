@@ -1834,6 +1834,24 @@ def chat(user_id):
 
     return render_template('chat.html', user=other_user, messages=messages, title="Chat", page='chat')
 
+@app.route('/delete_message/<int:message_id>', methods=['POST'])
+@login_required
+def delete_message(message_id):
+    # Obtener el mensaje a eliminar
+    message = ub.session.query(ub.Message).get(message_id)
+    
+    # Verificar que el mensaje existe y que el usuario actual es el remitente
+    if message and message.sender_id == current_user.id:
+        ub.session.delete(message)
+        ub.session.commit()
+        flash('Mensaje eliminado.', 'success')
+    else:
+        flash('No tienes permiso para eliminar este mensaje.', 'danger')
+
+    # Redirigir de vuelta al chat
+    return redirect(url_for('chat', user_id=message.receiver_id if message.sender_id == current_user.id else message.sender_id))
+
+
 @app.route('/notifications', methods=['GET'])
 @login_required
 def notifications():

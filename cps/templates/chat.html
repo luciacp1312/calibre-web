@@ -34,6 +34,13 @@
         color: #333;
         font-weight: bold;
     }
+    .delete-button {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
 </style>
 <div class="container mt-5">
     <h2 class="text-center mb-4">Chat con {{ user.name }}</h2>
@@ -48,7 +55,16 @@
                     <div class="username">{{ message.sender.name }}</div>
                     <div class="timestamp">{{ message.timestamp.strftime('%H:%M') }}</div>
                 </div>
-                <div class="content">{{ message.content }}</div>
+                <div class="content">
+                    {{ message.content }}
+                    {% if message.sender_id == current_user.id %}
+                        <!-- Formulario para eliminar el mensaje -->
+                        <form method="post" action="{{ url_for('delete_message', message_id=message.id) }}" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="delete-button btn btn-sm">Eliminar</button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
         {% endfor %}
     </div>
