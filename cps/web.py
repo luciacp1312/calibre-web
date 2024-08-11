@@ -1641,11 +1641,8 @@ def add_forum():
     if request.method == 'POST':
         name = request.form.get('name')
         description = request.form.get('description', '')
-        category_id = request.form.get('category_id') # CREO QUE ES Category_name no el id
+        category_id = request.form.get('category_id')
         category_id = int(category_id)
-        #name = request.form['name']
-        #description = request.form['description']
-        #category_id = request.form['category_id']
         forum = ub.Forum(name=name, description=description, category_id=category_id)
         ub.session.add(forum)
         ub.session.commit()
@@ -1837,11 +1834,31 @@ def chat(user_id):
 
     return render_template('chat.html', user=other_user, messages=messages, title="Chat", page='chat')
 
-@app.route('/notifications')
+@app.route('/notifications', methods=['GET'])
 @login_required
 def notifications():
-    notifications = ub.session.query(ub.Notification).filter(ub.Notification.user_id==current_user.id).order_by(ub.Notification.timestamp.desc()).all()
-    return render_template('notifications.html', notifications=notifications, title="Notifications", page='notifications')
+    notifications = ub.session.query(ub.Notification).filter(ub.Notification.user_id == current_user.id).all()
+    
+    # Procesar los datos de las notificaciones
+    processed_notifications = []
+    for notification in notifications:
+        if 'ha comenzado a seguirte' in notification.message.lower():
+            # Obtener el nombre del seguidor
+            follower_name = notification.message.split(' ')[0]
+            follower = ub.session.query(ub.User).filter(ub.User.name == follower_name).first()
+            notification.follower_name = follower_name
+            notification.follower_id = follower.id if follower else None
+
+        elif 'mensaje de' in notification.message.lower():
+            # Obtener el nombre del remitente del mensaje
+            parts = notification.message.split('mensaje de ')[1]
+            sender_name = parts.split(' ')[0]
+            sender = ub.session.query(ub.User).filter(ub.User.name == sender_name).first()
+            notification.sender_id = sender.id if sender else None
+
+        processed_notifications.append(notification)
+
+    return render_template('notifications.html', notifications=processed_notifications, title="Notifications", page='notifications')
 
 @app.route('/notifications/delete_all', methods=['POST'])
 @login_required
@@ -1874,14 +1891,15 @@ def follow(username):
     if user == current_user:
         flash('You cannot follow yourself!')
         return redirect(url_for('user_profile', username=username))
+    
     current_user.follow(user)
     ub.session.commit()
-    
     
     # Crear notificación para el usuario seguido
     notification = ub.Notification(
         user_id=user.id,
-        message=f"{current_user.name} ha comenzado a seguirte."
+        message=f"{current_user.name} ha comenzado a seguirte.",
+        #sender_id=current_user.id  # Asegúrate de tener este campo en tu modelo Notification
     )
     ub.session.add(notification)
     ub.session.commit()

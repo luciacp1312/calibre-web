@@ -240,9 +240,11 @@ class Notification(Base):
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
     is_read = Column(Boolean, default=False)
     post_id = Column(Integer, ForeignKey('posts.id'))
+    #sender_id = Column(Integer, ForeignKey('user.id'))  # Agregado para almacenar el ID del remitente
+
     post = relationship('Post', back_populates='notifications')
-    
-    user = relationship('User', backref='notifications')
+    user = relationship('User', foreign_keys=[user_id], backref='notifications')
+    #sender = relationship('User', foreign_keys=[sender_id])
     
     def __repr__(self):
         return f"<Notification {self.message}>"

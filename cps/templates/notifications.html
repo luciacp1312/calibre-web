@@ -21,12 +21,25 @@
             <ul class="list-group mb-4">
                 {% for notification in notifications %}
                     <li class="list-group-item {% if not notification.is_read %}list-group-item-info{% endif %}">
-                        <span>{{ notification.message }}</span>
-                        <span class="float-right text-muted">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                        <span>
+                            {% set message = notification.message %}
+                            {% if 'mensaje de' in message.lower() %}
+                                {# Elimina la parte user_id=<id> #}
+                                {% set message = message | replace(' (user_id=' ~ notification.sender_id ~ ')', '') %}
+                            {% endif %}
+                            {{ message }}
 
-                        {% if notification.post_id %}
-                            <a href="{{ url_for('view_thread', thread_id=notification.post.thread_id) }}" class="btn btn-sm btn-link">Ver post</a>
-                        {% endif %}
+                            {% if 'ha comenzado a seguirte' in notification.message.lower() and notification.follower_name %}
+                                <a href="{{ url_for('user_profile', username=notification.follower_name) }}" class="btn btn-sm btn-link">Ver perfil</a>
+                            {% elif 'mensaje de' in notification.message.lower() and notification.sender_id %}
+                                <a href="{{ url_for('chat', user_id=notification.sender_id) }}" class="btn btn-sm btn-link">Ver mensaje</a>
+                            {% endif %}
+
+                            {% if notification.post_id %}
+                                <a href="{{ url_for('view_thread', thread_id=notification.post.thread_id) }}" class="btn btn-sm btn-link">Ver post</a>
+                            {% endif %}
+                        </span>
+                        <span class="float-right text-muted">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
 
                         <form action="{{ url_for('delete_notification', notification_id=notification.id) }}" method="POST" style="display: inline; margin-left: 10px;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
