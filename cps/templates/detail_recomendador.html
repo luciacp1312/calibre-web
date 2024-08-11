@@ -5,14 +5,14 @@
         {% for book in result %}
             <div class="row book-detail">
                 <div class="col-sm-3 col-lg-3 col-xs-5">
-                    <div class="cover">
-                        <img id="detailcover" title="{{ book.title }}" src="{{ book.thumbnail }}" alt="{{ book.title }}" onerror="this.onerror=null;this.src='/static/default-cover.jpg';">
+                    <div class="cover" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                        <img id="detailcover" class="centered-cover" title="{{ book.title }}" src="{{ book.thumbnail }}" alt="{{ book.title }}" onerror="this.onerror=null;this.src='/static/default-cover.jpg';">
                     </div>
                 </div>
                 <div class="col-sm-9 col-lg-9 book-meta">
                     <h2 id="title">{{ book.title }}</h2>
                     <p class="author">{{ book.author }}</p>
-                    <p><strong>Publisher:</strong> {{ book.publisher }}</p>
+                    <p><strong>ISBN:</strong> {{ book.isbn }}</p>
                     <p><strong>Published Date:</strong> {{ book.publishedDate }}</p>
                     <p><strong>Page Count:</strong> {{ book.pageCount }}</p>
                     <p><strong>Language:</strong> {{ book.language }}</p>
@@ -29,3 +29,18 @@
     {% endif %}
 </div>
 {% endblock %}
+
+<style>
+    .cover {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+    
+    .centered-cover {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+</style>

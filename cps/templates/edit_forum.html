@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}Editar Foro{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h2>Editar Foro</h2>
+    <form method="post" action="{{ url_for('edit_forum', forum_id=forum.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="name">Nombre:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ forum.name }}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Descripción:</label>
+            <textarea class="form-control" id="description" name="description">{{ forum.description }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="category_id">Categoría:</label>
+            <select class="form-control" id="category_id" name="category_id" required>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id == forum.category_id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    </form>
+    <a href="{{ url_for('manage_forums') }}" class="btn btn-secondary mt-3">Volver a Foros</a>
+</div>
+{% endblock %}

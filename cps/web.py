@@ -113,7 +113,9 @@ def add_security_headers(resp):
     csp += "font-src 'self' data:"
     if request.endpoint == "web.read_book":
         csp += " blob:"
-    csp += "; img-src 'self'"
+    #csp += "; img-src 'self'"
+    # NUEVO permitir imágenes del recomendador
+    csp += "; img-src 'self' http://books.google.com https://books.google.com"
     if request.path.startswith("/author/") and config.config_use_goodreads:
         csp += " images.gr-assets.com i.gr-assets.com s.gr-assets.com"
     csp += " data:"
@@ -1359,8 +1361,9 @@ def recomendaciones():
                 #'id': book_info.id,
                 'title': book_info['title'],
                 'author': book_info['author'],
+                'isbn': book_info['isbn'],
                 'description': book_info['description'],
-                'publisher': book_info['publication_info'],
+                #'publisher': book_info['publication_info'],
                 'publishedDate': book_info['publication_info'],
                 'pageCount': book_info['page_count'],
                 'language': book_info['language'],
@@ -1421,9 +1424,18 @@ def get_book_info(isbn=None, title=None):
     language = book.get('language', 'Unknown')
     thumbnail = book.get('imageLinks', {}).get('thumbnail', 'https://via.placeholder.com/150x220?text=No+Image')
 
+    # Obtener ISBN
+    industry_identifiers = book.get('industryIdentifiers', [])
+    isbn = 'N/A'
+    for identifier in industry_identifiers:
+        if identifier['type'] in ['ISBN_10', 'ISBN_13']:
+            isbn = identifier['identifier']
+            break
+        
     book_info = {
         'title': title,
         'author': author,
+        'isbn': isbn,
         'publication_info': publication_info,
         'description': description,
         'page_count': page_count,
@@ -1655,6 +1667,37 @@ def add_forum():
         title="Forum",
         page = 'forum'
     )
+
+@app.route('/forums/edit/<int:forum_id>', methods=['GET', 'POST'])
+@login_required
+def edit_forum(forum_id):
+    forum = ub.session.query(ub.Forum).get(forum_id)
+    if not forum:
+        flash('Forum not found!', 'danger')
+        return redirect(url_for('manage_forums'))
+    
+    if request.method == 'POST':
+        forum.name = request.form.get('name')
+        forum.description = request.form.get('description', '')
+        forum.category_id = int(request.form.get('category_id'))
+        
+        try:
+            ub.session.commit()
+            flash('Forum updated successfully!', 'success')
+            return redirect(url_for('manage_forums'))
+        except Exception as e:
+            ub.session.rollback()
+            flash('There was an error updating the forum. Please try again.', 'danger')
+    
+    categories = ub.session.query(ub.ForumCategory).all()
+    return render_title_template(
+        'edit_forum.html',
+        forum=forum,
+        categories=categories,
+        title="Edit Forum",
+        page='forum'
+    )
+
 
 # Ver hilos en un foro específico
 @app.route('/forums/<int:forum_id>')
