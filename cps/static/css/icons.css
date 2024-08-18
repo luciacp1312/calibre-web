@@ -1,0 +1,10 @@
+/* Custom CSS for volume icon */
+.icon-volume-up::before {
+    content: "\f028"; /* Unicode for volume-up icon from Font Awesome */
+    font-family: 'FontAwesome';
+    font-weight: normal;
+    font-style: normal;
+    text-decoration: inherit;
+    display: inline-block;
+    font-size: 24px; /* Adjust the size if needed */
+}

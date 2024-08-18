@@ -2041,6 +2041,9 @@ def user_profile(username):
 ################################ NUEVO red social ################################
 
 #################################### NUEVO audio ####################################
+
+
+#ANTIGUO BOTON DE DESCARGA (tarda mucho o no descarga)
 def extract_text_from_epub(epub_path):
     book = epub.read_epub(epub_path)
     text_content = []
@@ -2066,20 +2069,6 @@ def get_audio_download_link(book_id, client):
     try:
         epub_path = os.path.join(config.get_book_path(), book.path, data.name + ".epub")
         text_content = extract_text_from_epub(epub_path)
-        
-        '''# ESTO ESTABA COMENTADO
-        # Asegurar que data esté en bytes
-        if not isinstance(data, bytes):
-            data = bytes(data)
-        epub_file = BytesIO(data)
-        text_content = ""
-        with zipfile.ZipFile(epub_file, 'r') as z:
-            for filename in z.namelist():
-                if filename.endswith('.xhtml') or filename.endswith('.html'):
-                    with z.open(filename) as f:
-                        text_content += f.read().decode('utf-8')
-        
-        # ESTO ESTABA COMENTADO'''
         
         if not text_content:
             log.error(f"No content found in the EPUB for book id {book_id}")
@@ -2113,51 +2102,6 @@ def download_audio(book_id, anyname):
 #################################### NUEVO antiguo descargar audio ####################################
    
     
-#################################### NUEVO mostrar audio (no descarga) ####################################
-'''def get_audio_stream(book_id, client):
-    book = calibre_db.get_book(book_id)
-    if not book:
-        log.error(f"Book id {book_id} not found for streaming audio")
-        abort(404)
-
-    data = calibre_db.get_book_format(book_id, 'EPUB')
-    if not data:
-        log.error(f"No EPUB format found for book id {book_id}")
-        abort(404)
-
-    try:
-        epub_path = os.path.join(config.get_book_path(), book.path, data.name + ".epub")
-        text_content = extract_text_from_epub(epub_path)
-
-        if not text_content:
-            log.error(f"No content found in the EPUB for book id {book_id}")
-            abort(404)
-
-        # Con GTTS
-        tts = gTTS(text=text_content, lang='es')
-        audio_file = BytesIO()
-        tts.write_to_fp(audio_file)
-        audio_file.seek(0)
-
-        return send_file(
-            audio_file,
-            as_attachment=False,  # Cambiado a False para streaming
-            download_name=f"{book.title}.mp3",
-            mimetype="audio/mpeg"
-        )
-    except Exception as e:
-        log.error(f"Error while generating audio: {str(e)}")
-        abort(500)
-
-@web.route("/stream_audio/<int:book_id>")
-@login_required_if_no_ano
-@download_required
-def stream_audio(book_id):
-    client = "kobo" if "Kobo" in request.headers.get('User-Agent') else ""
-    return get_audio_stream(book_id, client)'''
-
-#################################### NUEVO mostrar audio (no descarga) ####################################
-
 @web.route('/send/<int:book_id>/<book_format>/<int:convert>', methods=["POST"])
 @login_required_if_no_ano
 @download_required

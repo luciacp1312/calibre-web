@@ -14,39 +14,28 @@
     <link rel="apple-touch-icon" sizes="140x140" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
+    <!-- NUEVO importar Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/libs/normalize.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/reader.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}"> <!-- Custom Icons -->
+
 </head>
 
 <body>
     <div id="sidebar">
         <div id="panels">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <!--input id="searchBox" placeholder="search" type="search"-->
-
-            <!--a id="show-Search" class="show_view icon-search" data-view="Search">Search</a-->
             <a id="show-Toc" class="show_view icon-list-1 active" data-view="Toc">TOC</a>
             <a id="show-Bookmarks" class="show_view icon-bookmark" data-view="Bookmarks">Bookmarks</a>
-            <!--a id="show-Notes" class="show_view icon-edit" data-view="Notes">Notes</a-->
-
         </div>
-        <div id="tocView" class="view">
-        </div>
-        <!--div id="searchView" class="view">
-          <ul id="searchResults"></ul>
-        </div-->
+        <div id="tocView" class="view"></div>
         <div id="bookmarksView" class="view">
             <ul id="bookmarks"></ul>
         </div>
-        <!--div id="notesView" class="view">
-          <div id="new-note">
-            <textarea id="note-text"></textarea>
-            <button id="note-anchor">Anchor</button>
-          </div>
-          <ol id="notes"></ol>
-        </div-->
     </div>
     <div id="main">
 
@@ -55,44 +44,46 @@
                 <a id="slider" class="icon-menu">Menu</a>
             </div>
             <div id="metainfo">
-	            <span id="book-title"></span>
-	            <span id="title-seperator">&nbsp;&nbsp;–&nbsp;&nbsp;</span>
-	            <span id="chapter-title"></span>
-	        </div>
-	        <div id="title-controls">
-	            <a id="bookmark" class="icon-bookmark-empty">Bookmark</a>
-	            <a id="setting" class="icon-cog">Settings</a>
-	            <a id="fullscreen" class="icon-resize-full">Fullscreen</a>            
-	        </div>
-	    </div>
+                <span id="book-title"></span>
+                <span id="title-seperator">&nbsp;&nbsp;–&nbsp;&nbsp;</span>
+                <span id="chapter-title"></span>
+            </div>
+            <div id="title-controls">
+                <a id="bookmark" class="icon-bookmark-empty">Bookmark</a>
+                <a id="setting" class="icon-cog">Settings</a>
+                <!--<a id="audio" class="fas fa-volume-up" title="Read Aloud"></a>-->
+                <a id="audio" title="Read Aloud">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11.536 14.01a.5.5 0 0 1-.607-.276c-.141-.326-.518-.474-.787-.27-.269.205-.36.61-.278.96a.5.5 0 1 1-.975.216c-.17-.723.061-1.42.598-1.86.537-.44 1.294-.572 1.832-.379.54.192.872.693.806 1.262a.5.5 0 0 1-.539.527zm.982-2.606a.5.5 0 0 1-.682.18 3.506 3.506 0 0 0-1.784-.472 3.502 3.502 0 0 0-1.761.472.5.5 0 1 1-.522-.853 4.501 4.501 0 0 1 4.497 0 .5.5 0 0 1 .252.673zm1.717-2.55a.5.5 0 0 1-.696.178 5.493 5.493 0 0 0-2.65-.67 5.493 5.493 0 0 0-2.668.67.5.5 0 0 1-.502-.86 6.498 6.498 0 0 1 3.17-.798c1.07 0 2.107.233 3.15.684a.5.5 0 0 1 .196.796zm1.665-2.687a.5.5 0 0 1-.693.178 7.496 7.496 0 0 0-3.64-.903 7.5 7.5 0 0 0-3.655.903.5.5 0 1 1-.526-.853 8.496 8.496 0 0 1 4.166-1.032c1.306 0 2.582.34 3.853 1.025a.5.5 0 0 1 .195.782z"/>
+                        <path d="M8.224 2.926c.58-.553 1.402-.926 2.25-.926h.011c.487 0 .954.148 1.342.39.389.243.775.633.775 1.117v8.184c0 .496-.378.883-.77 1.127-.393.243-.86.384-1.348.384-.844 0-1.674-.376-2.245-.936a1.587 1.587 0 0 0-1.026-.396H4.732a.5.5 0 0 1-.474-.684l.563-1.27c.168-.38.218-.82.137-1.238-.08-.419-.271-.812-.561-1.12l-.523-.55a.5.5 0 0 1-.063-.66l.73-.73a.5.5 0 0 1 .724-.072l.857.76c.314.276.597.603.8.98.204.376.36.788.47 1.213l.394 1.665H8.25c.575 0 1.097-.208 1.473-.582z"/>
+                    </svg>
+                </a>
+                
+                
+                <a id="fullscreen" class="icon-resize-full">Fullscreen</a>            
+            </div>
+        </div>
 
-	    <div id="divider"></div>
-	    <div id="prev" class="arrow">‹</div>
-	    <div id="viewer"></div>
-	    <div id="next" class="arrow">›</div>
-	    <div id="progress">0%</div>
-	    <div id="loader"><img src="{{ url_for('static', filename='img/loader.gif') }}"></div>
-	</div>
+        <div id="divider"></div>
+        <div id="prev" class="arrow">‹</div>
+        <div id="viewer"></div>
+        <div id="next" class="arrow">›</div>
+        <div id="progress">0%</div>
+        <div id="loader"><img src="{{ url_for('static', filename='img/loader.gif') }}"></div>
+    </div>
     <div class="modal md-effect-1" id="settings-modal">
         <div class="md-content">
             <h3>{{_('Settings')}}</h3>
             <div class="form-group themes" id="themes">
                 Choose a theme below: <br />
-
-                <!-- Hardcoded a tick in the light theme button because it is the "default" theme. Need to find a way to do this dynamically on startup-->
-                <button type="button" id="lightTheme" class="lightTheme" onclick="selectTheme(this.id)"><span
-                        id="lightSelected">✓</span>{{_('Light')}}</button>
-                <button type="button" id="darkTheme" class="darkTheme" onclick="selectTheme(this.id)"><span
-                        id="darkSelected"> </span>{{_('Dark')}}</button>
-                <button type="button" id="sepiaTheme" class="sepiaTheme" onclick="selectTheme(this.id)"><span
-                        id="sepiaSelected"> </span>{{_('Sepia')}}</button>
-                <button type="button" id="blackTheme" class="blackTheme" onclick="selectTheme(this.id)"><span
-                        id="blackSelected"> </span>{{_('Black')}}</button>
+                <button type="button" id="lightTheme" class="lightTheme" onclick="selectTheme(this.id)"><span id="lightSelected">✓</span>{{_('Light')}}</button>
+                <button type="button" id="darkTheme" class="darkTheme" onclick="selectTheme(this.id)"><span id="darkSelected"> </span>{{_('Dark')}}</button>
+                <button type="button" id="sepiaTheme" class="sepiaTheme" onclick="selectTheme(this.id)"><span id="sepiaSelected"> </span>{{_('Sepia')}}</button>
+                <button type="button" id="blackTheme" class="blackTheme" onclick="selectTheme(this.id)"><span id="blackSelected"> </span>{{_('Black')}}</button>
             </div>
             <div class="form-group">
                 <p>
-                    <input type="checkbox" id="sidebarReflow"
-                        name="sidebarReflow">{{_('Reflow text when sidebars are open.')}}
+                    <input type="checkbox" id="sidebarReflow" name="sidebarReflow">{{_('Reflow text when sidebars are open.')}}
                 </p>
             </div>
             <div class="form-group fontSizeWrapper">
@@ -101,26 +92,25 @@
                     <input type="range" min="75" max="200" value="100" id="fontSizeFader" step="25">
                 </div>            
             </div>
-              <div class="font" id="font">
+            <div class="font" id="font">
                 <label class="item">{{_('Font')}}:</label>
                 <button type="button" id="default" onclick="selectFont(this.id)"><span>✓</span>{{_('Default')}}</button> 
                 <button type="button" id="Yahei" onclick="selectFont(this.id)"><span></span>{{_('Yahei')}}</button>
                 <button type="button" id="SimSun" onclick="selectFont(this.id)"><span></span>{{_('SimSun')}}</button>
                 <button type="button" id="KaiTi" onclick="selectFont(this.id)"><span></span>{{_('KaiTi')}}</button>
                 <button type="button" id="Arial" onclick="selectFont(this.id)"><span></span>{{_('Arial')}}</button>
-              </div>
-              <div class="layou" id="layout">
+            </div>
+            <div class="layou" id="layout">
                 <label class="item">{{ _('Spread') }}:</label>
                 <button type="button" id="spread" onclick="spread(this.id)"><span>✓</span>{{_('Two columns')}}</button>
                 <button type="button" id="nonespread" onclick="spread(this.id)"><span></span>{{_('One column')}}</button>
-              </div>            
+            </div>            
             <div class="closer icon-cancel-circled"></div>
         </div>
     </div>
     <div class="overlay"></div>
     <script src="{{ url_for('static', filename='js/libs/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/compress/jszip_epub.min.js') }}">
-    </script>
+    <script src="{{ url_for('static', filename='js/compress/jszip_epub.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/libs/epub.min.js') }}"></script>
     <script type="text/javascript">
         window.calibre = {
@@ -151,11 +141,11 @@
             },
         };
 
-        function selectTheme (id) {
+        function selectTheme(id) {
             let tickSpans = document.getElementById("themes").querySelectorAll("span");
 
             // Remove tick mark from all theme buttons
-            tickSpans.forEach(function (tickSpan) {
+            tickSpans.forEach(function(tickSpan) {
                 document.getElementById(tickSpan.id).textContent = "";
             });
 
@@ -168,7 +158,7 @@
             // Apply theme to epubjs iframe
             reader.rendition.themes.select(id);
 
-            // Apply theme to rest of the page. 
+            // Apply theme to rest of the page.
             document.getElementById("main").style.backgroundColor = themes[id]["bgColor"];
         }
 
@@ -206,10 +196,144 @@
           document.getElementById(id).querySelector("span").textContent = "✓";
           reader.rendition.spread(id==='spread'?true:'none');
         }
-      </script>
-      <script src="{{ url_for('static', filename='js/libs/screenfull.min.js') }}"></script>
-      <script src="{{ url_for('static', filename='js/libs/reader.min.js') }}"></script>
-      <script src="{{ url_for('static', filename='js/reading/epub.js') }}"></script>
-      <script src="{{ url_for('static', filename='js/reading/epub-progress.js') }}"></script>      
-    </body>
+
+        // Variables para el control de la síntesis de voz
+        let isSpeaking = false;
+        let synth = window.speechSynthesis;
+        let utterance = null;
+
+        /*// Función para iniciar la lectura de la página
+        function startReading() {
+            // Obtener el contenido visible en la página actual
+            let content = document.querySelector("#viewer").textContent.trim();
+            console.log("Contenido a leer:", content);
+            // El content está vacío
+
+            // Si ya se está leyendo, detener la lectura
+            if (isSpeaking) {
+                synth.cancel();
+                isSpeaking = false;
+                document.getElementById("audio").classList.remove("speaking");
+                return;
+            }
+
+            // Configurar la síntesis de voz
+            utterance = new SpeechSynthesisUtterance(content);
+            utterance.lang = "es-ES"; // Configura el idioma según el contenido
+            utterance.rate = 1; // Ajusta la velocidad de lectura
+
+            // Marcar que está leyendo
+            isSpeaking = true;
+            document.getElementById("audio").classList.add("speaking");
+
+            // Manejar el fin de la lectura
+            utterance.onend = function () {
+                isSpeaking = false;
+                document.getElementById("audio").classList.remove("speaking");
+            };
+
+            // Iniciar la lectura
+            synth.speak(utterance);
+        }*/
+        
+        // NUEVO otra funcion startReading
+        function startReading() {
+            let content = '';
+            const iframe = document.querySelector("#viewer iframe");
+        
+            if (iframe) {
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                content = iframeDocument.body.textContent.trim();
+            } else {
+                content = document.querySelector("#viewer").textContent.trim();
+            }
+        
+            if (content === '') {
+                console.error("No se encontró contenido para leer.");
+                return;
+            }
+        
+            console.log("Contenido a leer:", content);
+        
+            if (isSpeaking) {
+                synth.cancel();
+                isSpeaking = false;
+                document.getElementById("audio").classList.remove("speaking");
+                return;
+            }
+        
+            utterance = new SpeechSynthesisUtterance(content);
+            utterance.lang = "es-ES"; // Cambia al idioma deseado
+            utterance.rate = 1; // Ajusta la velocidad de lectura
+        
+            isSpeaking = true;
+            document.getElementById("audio").classList.add("speaking");
+        
+            utterance.onend = function () {
+                isSpeaking = false;
+                document.getElementById("audio").classList.remove("speaking");
+            };
+        
+            synth.speak(utterance);
+        }
+        // NUEVO otra funcion startReading
+
+        // Asignar la función de lectura al botón de audio
+        document.getElementById("audio").addEventListener("click", startReading);
+    </script>
+
+    <script>
+      // Función para mostrar el contenido de #viewer en la consola
+      function logViewerContent() {
+        const viewer = document.querySelector("#viewer");
+
+        if (viewer) {
+            const observer = new MutationObserver(() => {
+                console.log("Nuevo contenido en #viewer:", viewer.textContent.trim());
+            });
+
+            observer.observe(viewer, { childList: true, subtree: true });
+        } else {
+            console.log("Elemento #viewer no encontrado");
+        }
+
+        let content = document.querySelector("#viewer").textContent.trim();
+        console.log("Contenido de #viewer:", content);
+      }
+  
+      // Agregar event listener al botón "next"
+      document.querySelector("#next").addEventListener("click", function() {
+          logViewerContent();
+      });
+  
+      // Agregar event listener al botón "prev"
+      document.querySelector("#prev").addEventListener("click", function() {
+          logViewerContent();
+      });
+
+
+      // NUEVO ver de iframe
+  // Añadir el código para capturar el contenido del iframe
+  document.addEventListener("DOMContentLoaded", function () {
+    // Esperar a que el contenido del visor EPUB esté cargado
+    const iframe = document.getElementById("epubjs-view-65f79d05-a290-409d-86a1-4bfb18c2d917");
+
+    if (iframe) {
+        iframe.addEventListener("load", function() {
+            const content = iframe.getAttribute("srcdoc");
+            console.log("Contenido del iframe:", content);
+        });
+    } else {
+        console.error("El iframe con id 'epubjs-view-65f79d05-a290-409d-86a1-4bfb18c2d917' no se encontró en el DOM.");
+    }
+  });
+      // NUEVO ver de iframe
+  </script>
+  
+
+    <script src="{{ url_for('static', filename='js/libs/screenfull.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/libs/reader.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/reading/epub.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/reading/epub-progress.js') }}"></script>
+</body>
 </html>
