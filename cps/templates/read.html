@@ -201,85 +201,67 @@
         let isSpeaking = false;
         let synth = window.speechSynthesis;
         let utterance = null;
+        let lastCharIndex = 0;
+        let isPaused = false;
 
-        /*// Función para iniciar la lectura de la página
-        function startReading() {
-            // Obtener el contenido visible en la página actual
-            let content = document.querySelector("#viewer").textContent.trim();
-            console.log("Contenido a leer:", content);
-            // El content está vacío
-
-            // Si ya se está leyendo, detener la lectura
-            if (isSpeaking) {
-                synth.cancel();
-                isSpeaking = false;
-                document.getElementById("audio").classList.remove("speaking");
-                return;
-            }
-
-            // Configurar la síntesis de voz
-            utterance = new SpeechSynthesisUtterance(content);
-            utterance.lang = "es-ES"; // Configura el idioma según el contenido
-            utterance.rate = 1; // Ajusta la velocidad de lectura
-
-            // Marcar que está leyendo
-            isSpeaking = true;
-            document.getElementById("audio").classList.add("speaking");
-
-            // Manejar el fin de la lectura
-            utterance.onend = function () {
-                isSpeaking = false;
-                document.getElementById("audio").classList.remove("speaking");
-            };
-
-            // Iniciar la lectura
-            synth.speak(utterance);
-        }*/
-        
-        // NUEVO otra funcion startReading
         function startReading() {
             let content = '';
             const iframe = document.querySelector("#viewer iframe");
-        
+
             if (iframe) {
                 const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
                 content = iframeDocument.body.textContent.trim();
             } else {
                 content = document.querySelector("#viewer").textContent.trim();
             }
-        
+
             if (content === '') {
                 console.error("No se encontró contenido para leer.");
                 return;
             }
-        
-            console.log("Contenido a leer:", content);
-        
+
             if (isSpeaking) {
-                synth.cancel();
-                isSpeaking = false;
-                document.getElementById("audio").classList.remove("speaking");
+                pauseReading();
                 return;
             }
-        
-            utterance = new SpeechSynthesisUtterance(content);
-            utterance.lang = "es-ES"; // Cambia al idioma deseado
-            utterance.rate = 1; // Ajusta la velocidad de lectura
-        
+
+            utterance = new SpeechSynthesisUtterance(content.substring(lastCharIndex));
+            utterance.lang = "es-ES"; 
+            utterance.rate = 1;
+
             isSpeaking = true;
+            isPaused = false;
             document.getElementById("audio").classList.add("speaking");
-        
+
+            utterance.onboundary = function(event) {
+                if (event.name === 'word') {
+                    lastCharIndex = event.charIndex; 
+                }
+            };
+
             utterance.onend = function () {
                 isSpeaking = false;
+                isPaused = false;
+                lastCharIndex = 0;
                 document.getElementById("audio").classList.remove("speaking");
             };
-        
+
             synth.speak(utterance);
         }
-        // NUEVO otra funcion startReading
 
-        // Asignar la función de lectura al botón de audio
+        function pauseReading() {
+            if (isSpeaking && !isPaused) {
+                synth.cancel();
+                isPaused = true;
+                isSpeaking = false;
+                document.getElementById("audio").classList.remove("speaking");
+            } else if (isPaused) {
+                startReading(); 
+            }
+        }
+
         document.getElementById("audio").addEventListener("click", startReading);
+
     </script>
 
     <script>
