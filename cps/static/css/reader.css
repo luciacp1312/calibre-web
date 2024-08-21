@@ -45,3 +45,44 @@
     margin-right: 1%;
     font-size: 16px;
 }
+
+#progress-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-top: 1px solid #ccc;
+    border-radius: 5px;
+    width: 80%; /* Ajusta el ancho al 80% del contenedor */
+    margin: 0 auto; /* Centra el contenedor en la pantalla */
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#current-time,
+#total-time {
+    font-size: 14px;
+    margin: 0 10px;
+    /*color: #333;*/
+    font-family: Arial, sans-serif;
+}
+
+#progress-bar {
+    flex: 1;
+    margin: 0 5px;
+    height: 4px;
+    background: black;
+}
+
+/* NUEVO */
+#audio-toggle {
+    margin-right: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+#audio-toggle svg {
+    width: 24px;
+    height: 24px;
+}

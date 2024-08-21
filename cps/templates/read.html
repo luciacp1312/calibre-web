@@ -51,13 +51,13 @@
             <div id="title-controls">
                 <a id="bookmark" class="icon-bookmark-empty">Bookmark</a>
                 <a id="setting" class="icon-cog">Settings</a>
-                <!--<a id="audio" class="fas fa-volume-up" title="Read Aloud"></a>-->
+                <!-- Eliminar el botón del title-controls
                 <a id="audio" title="Read Aloud">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M11.536 14.01a.5.5 0 0 1-.607-.276c-.141-.326-.518-.474-.787-.27-.269.205-.36.61-.278.96a.5.5 0 1 1-.975.216c-.17-.723.061-1.42.598-1.86.537-.44 1.294-.572 1.832-.379.54.192.872.693.806 1.262a.5.5 0 0 1-.539.527zm.982-2.606a.5.5 0 0 1-.682.18 3.506 3.506 0 0 0-1.784-.472 3.502 3.502 0 0 0-1.761.472.5.5 0 1 1-.522-.853 4.501 4.501 0 0 1 4.497 0 .5.5 0 0 1 .252.673zm1.717-2.55a.5.5 0 0 1-.696.178 5.493 5.493 0 0 0-2.65-.67 5.493 5.493 0 0 0-2.668.67.5.5 0 0 1-.502-.86 6.498 6.498 0 0 1 3.17-.798c1.07 0 2.107.233 3.15.684a.5.5 0 0 1 .196.796zm1.665-2.687a.5.5 0 0 1-.693.178 7.496 7.496 0 0 0-3.64-.903 7.5 7.5 0 0 0-3.655.903.5.5 0 1 1-.526-.853 8.496 8.496 0 0 1 4.166-1.032c1.306 0 2.582.34 3.853 1.025a.5.5 0 0 1 .195.782z"/>
                         <path d="M8.224 2.926c.58-.553 1.402-.926 2.25-.926h.011c.487 0 .954.148 1.342.39.389.243.775.633.775 1.117v8.184c0 .496-.378.883-.77 1.127-.393.243-.86.384-1.348.384-.844 0-1.674-.376-2.245-.936a1.587 1.587 0 0 0-1.026-.396H4.732a.5.5 0 0 1-.474-.684l.563-1.27c.168-.38.218-.82.137-1.238-.08-.419-.271-.812-.561-1.12l-.523-.55a.5.5 0 0 1-.063-.66l.73-.73a.5.5 0 0 1 .724-.072l.857.76c.314.276.597.603.8.98.204.376.36.788.47 1.213l.394 1.665H8.25c.575 0 1.097-.208 1.473-.582z"/>
                     </svg>
-                </a>
+                </a>-->
                 
                 
                 <a id="fullscreen" class="icon-resize-full">Fullscreen</a>            
@@ -67,6 +67,25 @@
         <div id="divider"></div>
         <div id="prev" class="arrow">‹</div>
         <div id="viewer"></div>
+        <!-- NUEVO barra audio
+        <div id="progress-container">
+            <span id="current-time">00:00</span>
+            <input type="range" id="progress-bar" value="0" min="0" max="100">
+            <span id="total-time">00:00</span>
+        </div>-->
+        <!-- NUEVO barra progreso audio -->
+        <div id="progress-container">
+            <a id="audio-toggle" class="audio-control">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.536 14.01a.5.5 0 0 1-.607-.276c-.141-.326-.518-.474-.787-.27-.269.205-.36.61-.278.96a.5.5 0 1 1-.975.216c-.17-.723.061-1.42.598-1.86.537-.44 1.294-.572 1.832-.379.54.192.872.693.806 1.262a.5.5 0 0 1-.539.527zm.982-2.606a.5.5 0 0 1-.682.18 3.506 3.506 0 0 0-1.784-.472 3.502 3.502 0 0 0-1.761.472.5.5 0 1 1-.522-.853 4.501 4.501 0 0 1 4.497 0 .5.5 0 0 1 .252.673zm1.717-2.55a.5.5 0 0 1-.696.178 5.493 5.493 0 0 0-2.65-.67 5.493 5.493 0 0 0-2.668.67.5.5 0 0 1-.502-.86 6.498 6.498 0 0 1 3.17-.798c1.07 0 2.107.233 3.15.684a.5.5 0 0 1 .196.796zm1.665-2.687a.5.5 0 0 1-.693.178 7.496 7.496 0 0 0-3.64-.903 7.5 7.5 0 0 0-3.655.903.5.5 0 1 1-.526-.853 8.496 8.496 0 0 1 4.166-1.032c1.306 0 2.582.34 3.853 1.025a.5.5 0 0 1 .195.782z"/>
+                    <path d="M8.224 2.926c.58-.553 1.402-.926 2.25-.926h.011c.487 0 .954.148 1.342.39.389.243.775.633.775 1.117v8.184c0 .496-.378.883-.77 1.127-.393.243-.86.384-1.348.384-.844 0-1.674-.376-2.245-.936a1.587 1.587 0 0 0-1.026-.396H4.732a.5.5 0 0 1-.474-.684l.563-1.27c.168-.38.218-.82.137-1.238-.08-.419-.271-.812-.561-1.12l-.523-.55a.5.5 0 0 1-.063-.66l.73-.73a.5.5 0 0 1 .724-.072l.857.76c.314.276.597.603.8.98.204.376.36.788.47 1.213l.394 1.665H8.25c.575 0 1.097-.208 1.473-.582z"/>
+                </svg>
+            </a>
+            <span id="current-time">00:00</span>
+            <input type="range" id="progress-bar" value="0" min="0" max="100">
+            <span id="total-time">00:00</span>
+        </div>
+        <!-- NUEVO barra audio -->
         <div id="next" class="arrow">›</div>
         <div id="progress">0%</div>
         <div id="loader"><img src="{{ url_for('static', filename='img/loader.gif') }}"></div>
@@ -121,7 +140,7 @@
             bookmark: "{{ bookmark.bookmark_key if bookmark != None }}",
             useBookmarks: "{{ current_user.is_authenticated | tojson }}"
         };
-
+        
         window.themes = {
             "darkTheme": {
                 "bgColor": "#202124",
@@ -138,178 +157,209 @@
             "blackTheme": {
                 "bgColor": "black",
                 "css_path": "{{ url_for('static', filename='css/epub_themes.css') }}"
-            },
+            }
         };
-
+        
         function selectTheme(id) {
             let tickSpans = document.getElementById("themes").querySelectorAll("span");
-
-            // Remove tick mark from all theme buttons
-            tickSpans.forEach(function(tickSpan) {
-                document.getElementById(tickSpan.id).textContent = "";
-            });
-
-            // Add tick mark to the button corresponding to the currently selected theme
+            tickSpans.forEach(span => span.textContent = "");
             document.getElementById(id).querySelector("span").textContent = "✓";
-
-            // Saving theme to local storage
+        
             localStorage.setItem("calibre.reader.theme", id);
-            
-            // Apply theme to epubjs iframe
             reader.rendition.themes.select(id);
-
-            // Apply theme to rest of the page.
-            document.getElementById("main").style.backgroundColor = themes[id]["bgColor"];
+            document.getElementById("main").style.backgroundColor = window.themes[id]["bgColor"];
         }
-
-        // font size settings logic
-        let fontSizeFader = document.getElementById('fontSizeFader');
-        fontSizeFader.addEventListener("change", function () {
+        
+        document.getElementById('fontSizeFader').addEventListener("change", function () {
             reader.rendition.themes.fontSize(`${this.value}%`);
         });
-
+        
         let defaultFont;
-
+        
         function selectFont(id) {
-          if (!defaultFont) {
-            defaultFont = reader.rendition.getContents()[0]?.css('font-family');
-          }
-
-          spans = document.getElementById("font").querySelectorAll("span");
-          for(var i = 0; i < spans.length; i++) {
-            spans[i].textContent = "";
-          }
-          document.getElementById(id).querySelector("span").textContent = "✓";
-          
-          if (id == 'default') {
-            reader.rendition.themes.font(defaultFont);
-            return;
-          }
-          reader.rendition.themes.font(id);
+            if (!defaultFont) {
+                defaultFont = reader.rendition.getContents()[0]?.css('font-family');
+            }
+        
+            document.querySelectorAll("#font span").forEach(span => span.textContent = "");
+            document.getElementById(id).querySelector("span").textContent = "✓";
+        
+            if (id === 'default') {
+                reader.rendition.themes.font(defaultFont);
+            } else {
+                reader.rendition.themes.font(id);
+            }
         }
-
+        
         function spread(id) {
-          spans = document.getElementById("layout").querySelectorAll("span");
-          for(var i = 0; i < spans.length; i++) {
-            spans[i].textContent = "";
-          }
-          document.getElementById(id).querySelector("span").textContent = "✓";
-          reader.rendition.spread(id==='spread'?true:'none');
+            document.querySelectorAll("#layout span").forEach(span => span.textContent = "");
+            document.getElementById(id).querySelector("span").textContent = "✓";
+            reader.rendition.spread(id === 'spread' ? true : 'none');
         }
-
-        // Variables para el control de la síntesis de voz
+        
         let isSpeaking = false;
+        let isPaused = false;
         let synth = window.speechSynthesis;
         let utterance = null;
-        let lastCharIndex = 0;
-        let isPaused = false;
-
+        let textToRead = '';
+        let currentTextIndex = 0;
+        let currentTime = 0;
+        let totalTime = 600; // Valor inicial, será recalculado
+        let interval = null;
+        
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes < 10 ? '0' : ''}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        
+        function updateProgress() {
+            if (currentTime < totalTime) {
+                currentTime += 1;
+                document.getElementById('current-time').textContent = formatTime(currentTime);
+                document.getElementById('progress-bar').value = (currentTime / totalTime) * 100;
+            } else {
+                clearInterval(interval);
+            }
+        }
+        
+        function startProgress() {
+            interval = setInterval(updateProgress, 1000);
+        }
+        
+        function pauseProgress() {
+            clearInterval(interval);
+        }
+        
+        function moveToTime(newTime) {
+            currentTime = newTime;
+            document.getElementById('current-time').textContent = formatTime(currentTime);
+            document.getElementById('progress-bar').value = (currentTime / totalTime) * 100;
+        
+            let charIndex = Math.floor((currentTime / totalTime) * textToRead.length);
+            currentTextIndex = charIndex;
+        
+            if (isSpeaking) {
+                synth.cancel();
+                startReading();
+            }
+        }
+        
+        function calculateTotalTime(text) {
+            const wordsPerMinute = 200;
+            const wordCount = text.split(/\s+/).length;
+            return Math.ceil((wordCount / wordsPerMinute) * 60);
+        }
+        
         function startReading() {
-            let content = '';
             const iframe = document.querySelector("#viewer iframe");
-
+        
             if (iframe) {
                 const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                content = iframeDocument.body.textContent.trim();
+                textToRead = iframeDocument.body.textContent.trim();
             } else {
-                content = document.querySelector("#viewer").textContent.trim();
+                textToRead = document.querySelector("#viewer").textContent.trim();
             }
-
-            if (content === '') {
+        
+            if (textToRead === '') {
                 console.error("No se encontró contenido para leer.");
                 return;
             }
-
+        
+            totalTime = calculateTotalTime(textToRead);
+            document.getElementById('total-time').textContent = formatTime(totalTime);
+        
+            currentTime = Math.max(currentTime, 0);
+            document.getElementById('current-time').textContent = formatTime(currentTime);
+            document.getElementById('progress-bar').value = (currentTime / totalTime) * 100;
+        
             if (isSpeaking) {
                 pauseReading();
                 return;
             }
-
-            utterance = new SpeechSynthesisUtterance(content.substring(lastCharIndex));
-            utterance.lang = "es-ES"; 
+        
+            utterance = new SpeechSynthesisUtterance(textToRead.substring(currentTextIndex));
+            utterance.lang = "es-ES";
             utterance.rate = 1;
-
+        
             isSpeaking = true;
             isPaused = false;
-            document.getElementById("audio").classList.add("speaking");
-
+            document.getElementById("audio-toggle").classList.add("speaking");
+        
             utterance.onboundary = function(event) {
                 if (event.name === 'word') {
-                    lastCharIndex = event.charIndex; 
+                    currentTextIndex = event.charIndex;
                 }
             };
-
+        
             utterance.onend = function () {
                 isSpeaking = false;
                 isPaused = false;
-                lastCharIndex = 0;
-                document.getElementById("audio").classList.remove("speaking");
+                currentTextIndex = 0;
+                document.getElementById("audio-toggle").classList.remove("speaking");
             };
-
+        
             synth.speak(utterance);
+            startProgress();
         }
-
+        
         function pauseReading() {
             if (isSpeaking && !isPaused) {
                 synth.cancel();
                 isPaused = true;
                 isSpeaking = false;
-                document.getElementById("audio").classList.remove("speaking");
+                document.getElementById("audio-toggle").classList.remove("speaking");
+                pauseProgress();
             } else if (isPaused) {
-                startReading(); 
+                startReading();
             }
         }
-
-        document.getElementById("audio").addEventListener("click", startReading);
-
-    </script>
-
-    <script>
-      // Función para mostrar el contenido de #viewer en la consola
-      function logViewerContent() {
-        const viewer = document.querySelector("#viewer");
-
-        if (viewer) {
-            const observer = new MutationObserver(() => {
-                console.log("Nuevo contenido en #viewer:", viewer.textContent.trim());
-            });
-
-            observer.observe(viewer, { childList: true, subtree: true });
-        } else {
-            console.log("Elemento #viewer no encontrado");
-        }
-
-        let content = document.querySelector("#viewer").textContent.trim();
-        console.log("Contenido de #viewer:", content);
-      }
-  
-      // Agregar event listener al botón "next"
-      document.querySelector("#next").addEventListener("click", function() {
-          logViewerContent();
-      });
-  
-      // Agregar event listener al botón "prev"
-      document.querySelector("#prev").addEventListener("click", function() {
-          logViewerContent();
-      });
-
-
-      // NUEVO ver de iframe
-  // Añadir el código para capturar el contenido del iframe
-  document.addEventListener("DOMContentLoaded", function () {
-    // Esperar a que el contenido del visor EPUB esté cargado
-    const iframe = document.getElementById("epubjs-view-65f79d05-a290-409d-86a1-4bfb18c2d917");
-
-    if (iframe) {
-        iframe.addEventListener("load", function() {
-            const content = iframe.getAttribute("srcdoc");
-            console.log("Contenido del iframe:", content);
+        
+        document.getElementById("audio-toggle").addEventListener("click", startReading);
+        
+        document.getElementById('progress-bar').addEventListener('input', function(event) {
+            const newTime = (event.target.value / 100) * totalTime;
+            moveToTime(newTime);
         });
-    } else {
-        console.error("El iframe con id 'epubjs-view-65f79d05-a290-409d-86a1-4bfb18c2d917' no se encontró en el DOM.");
-    }
-  });
-      // NUEVO ver de iframe
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById('total-time').textContent = formatTime(totalTime);
+            document.getElementById('current-time').textContent = formatTime(currentTime);
+        });
+        
+        function logViewerContent() {
+            const viewer = document.querySelector("#viewer");
+        
+            if (viewer) {
+                const observer = new MutationObserver(() => {
+                    console.log("Nuevo contenido en #viewer:", viewer.textContent.trim());
+                });
+        
+                observer.observe(viewer, { childList: true, subtree: true });
+            } else {
+                console.log("Elemento #viewer no encontrado");
+            }
+        
+            let content = viewer?.textContent.trim() || '';
+            console.log("Contenido de #viewer:", content);
+        }
+        
+        document.querySelector("#next").addEventListener("click", logViewerContent);
+        document.querySelector("#prev").addEventListener("click", logViewerContent);
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            const iframe = document.getElementById("epubjs-view-65f79d05-a290-409d-86a1-4bfb18c2d917");
+        
+            if (iframe) {
+                iframe.addEventListener("load", function() {
+                    const content = iframe.getAttribute("srcdoc");
+                    console.log("Contenido del iframe:", content);
+                });
+            } else {
+                console.error("El iframe con id 'epubjs-view-65f79d05-a290-409d-86a1-4bfb18c2d917' no se encontró en el DOM.");
+            }
+        });
+        
   </script>
   
 
