@@ -1,16 +1,16 @@
 {% extends "layout.html" %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{title}}{% endblock %}
 {% block body %}
 <div class="container">
     <h1>{{ title }}</h1>
     {% if current_user.role_admin() %}
-    <a href="{{ url_for('add_category') }}" class="btn btn-primary">Add Category</a>
+    <a href="{{ url_for('add_category') }}" class="btn btn-primary">Agregar Categoría</a>
     <table class="table mt-3">
         <thead>
             <tr>
-                <th><a href="{{ url_for('manage_categories', order='name') }}">Name</a></th>
-                <th><a href="{{ url_for('manage_categories', order='description') }}">Description</a></th>
-                <th>Actions</th>
+                <th><a href="{{ url_for('manage_categories', order='name') }}">Nombre</a></th>
+                <th><a href="{{ url_for('manage_categories', order='description') }}">Descripción</a></th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -21,7 +21,7 @@
                     <td>
                         <form action="{{ url_for('delete_category', category_id=category.id) }}" method="post" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this category?')">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres borrar esta categoría?')">Borrar</button>
                         </form>
                     </td>
                 </tr>

@@ -4,21 +4,21 @@
 <div class="container">
     <h1>{{ title }}</h1>
     {% if thread_id %}
-        <a href="{{ url_for('view_thread', thread_id=thread_id) }}" class="btn btn-secondary mt-3">Back to Thread</a>
+        <a href="{{ url_for('view_thread', thread_id=thread_id) }}" class="btn btn-secondary mt-3">Volver al Hilo</a>
     {% endif %}
     {% if thread_id %}
-        <a href="{{ url_for('add_post', thread_id=thread_id) }}" class="btn btn-primary">Add Post</a>
+        <a href="{{ url_for('add_post', thread_id=thread_id) }}" class="btn btn-primary">Agregar Post</a>
     {% else %}
-        <a href="{{ url_for('add_post', thread_id=0) }}" class="btn btn-primary">Add Post</a> <!-- Placeholder value -->
+        <a href="{{ url_for('add_post', thread_id=0) }}" class="btn btn-primary">Agregar Post</a> <!-- Placeholder value -->
     {% endif %}
     <table class="table">
         <thead>
             <tr>
-                <th>Content</th>
-                <th>Thread</th>
-                <th>User</th>
+                <th>Contenido</th>
+                <th>Hilo</th>
+                <th>Usuario</th>
                 {% if current_user.role_admin() %}
-                <th>Actions</th>
+                <th>Acciones</th>
                 {% endif %}
             </tr>
         </thead>
@@ -32,7 +32,7 @@
                     <td>
                         <form action="{{ url_for('delete_post', post_id=post.id) }}" method="post" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this post?')">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres borrar este post?')">Borrar</button>
                         </form>
                     </td>
                     {% endif %}

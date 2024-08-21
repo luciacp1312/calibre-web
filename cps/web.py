@@ -1606,7 +1606,7 @@ def manage_categories():
     return render_title_template(
         'manage_categories.html',
         categories=categories,
-        title="Categories",
+        title="Borrar Categorías",
         page='forum'
     )
     
@@ -1632,7 +1632,7 @@ def add_category():
         
         return redirect(url_for('manage_forums'))  # Redirigir a /forums después de agregar la categoría
 
-    return render_template('add_category.html', title="Categories", page='forum')
+    return render_title_template('add_category.html', title="Categories", page='forum')
 
 
 # Gestión de foros
@@ -1875,7 +1875,7 @@ def chat(user_id):
         ((ub.Message.sender_id == other_user.id) & (ub.Message.receiver_id == current_user.id))
     ).order_by(ub.Message.timestamp).all()
 
-    return render_template('chat.html', user=other_user, messages=messages, title="Chat", page='chat')
+    return render_title_template('chat.html', user=other_user, messages=messages, title="Chat", page='chat')
 
 @app.route('/delete_message/<int:message_id>', methods=['POST'])
 @login_required
@@ -1919,7 +1919,7 @@ def notifications():
 
         processed_notifications.append(notification)
 
-    return render_template('notifications.html', notifications=processed_notifications, title="Notifications", page='notifications')
+    return render_title_template('notifications.html', notifications=processed_notifications, title="Notifications", page='notifications')
 
 @app.route('/notifications/delete_all', methods=['POST'])
 @login_required
@@ -1989,7 +1989,7 @@ def unfollow(username):
 def following():
     following_ids = [assoc.followed_id for assoc in current_user.following_associations]
     users = ub.session.query(ub.User).filter(ub.User.id.in_(following_ids)).all()
-    return render_template('following.html', users=users, title="Following", page='following')
+    return render_title_template('following.html', users=users, title="Following", page='following')
 
   
 @app.route('/followers')
@@ -1997,7 +1997,7 @@ def following():
 def followers():
     follower_ids = [assoc.follower_id for assoc in current_user.follower_associations]
     users = ub.session.query(ub.User).filter(ub.User.id.in_(follower_ids)).all()
-    return render_template('followers.html', users=users, title="Followers", page='followers')
+    return render_title_template('followers.html', users=users, title="Followers", page='followers')
 
 
 @app.route('/search', methods=['GET'])
@@ -2008,7 +2008,7 @@ def search():
         users = ub.session.query(ub.User).filter(ub.User.name.like(f'{query}%')).all()
     else:
         users = []
-    return render_template('searchFollow.html', users=users, query=query, title="Search profiles", page='search Profiles')
+    return render_title_template('searchFollow.html', users=users, query=query, title="Search profiles", page='search Profiles')
 
 
 @app.route('/user/<username>')
@@ -2032,7 +2032,7 @@ def user_profile(username):
                 'cover_url': cover_url
             }
 
-    return render_template(
+    return render_title_template(
         'user_profile.html',
         user=user, downloads=downloads, books=books_dict, shelves=shelves, threads=threads, current_user=current_user,
         title="Profile",
@@ -2040,67 +2040,7 @@ def user_profile(username):
     )
 ################################ NUEVO red social ################################
 
-#################################### NUEVO audio ####################################
 
-
-#ANTIGUO BOTON DE DESCARGA (tarda mucho o no descarga)
-def extract_text_from_epub(epub_path):
-    book = epub.read_epub(epub_path)
-    text_content = []
-
-    for item in book.get_items():
-        if item.get_type() == ebooklib.ITEM_DOCUMENT:
-            soup = BeautifulSoup(item.get_body_content(), 'html.parser')
-            text_content.append(soup.get_text())
-
-    return ' '.join(text_content)
-
-def get_audio_download_link(book_id, client):
-    book = calibre_db.get_book(book_id)
-    if not book:
-        log.error(f"Book id {book_id} not found for downloading audio")
-        abort(404)
-
-    data = calibre_db.get_book_format(book_id, 'EPUB')
-    if not data:
-        log.error(f"No EPUB format found for book id {book_id}")
-        abort(404)
-
-    try:
-        epub_path = os.path.join(config.get_book_path(), book.path, data.name + ".epub")
-        text_content = extract_text_from_epub(epub_path)
-        
-        if not text_content:
-            log.error(f"No content found in the EPUB for book id {book_id}")
-            abort(404)
-
-        #Con GTTS
-        tts = gTTS(text=text_content, lang='es')
-        audio_file = BytesIO()
-        tts.write_to_fp(audio_file)
-        audio_file.seek(0)
-        
-        return send_file(
-            audio_file,
-            as_attachment=True,
-            download_name=f"{book.title}.mp3",
-            mimetype="audio/mpeg"
-        )
-    except Exception as e:
-        log.error(f"Error while generating audio: {str(e)}")
-        abort(500)
-        
-
-@web.route("/download_audio/<int:book_id>", defaults={'anyname': 'None'})
-@web.route("/download_audio/<int:book_id>/<anyname>")
-@login_required_if_no_ano
-@download_required
-def download_audio(book_id, anyname):
-    client = "kobo" if "Kobo" in request.headers.get('User-Agent') else ""
-    return get_audio_download_link(book_id, client)
- 
-#################################### NUEVO antiguo descargar audio ####################################
-   
     
 @web.route('/send/<int:book_id>/<book_format>/<int:convert>', methods=["POST"])
 @login_required_if_no_ano
