@@ -80,6 +80,12 @@
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    width: 15px; 
+    height: 15px;
+}
+
+#audio-toggle i {
+    font-size: 24px;
 }
 
 #audio-toggle svg {

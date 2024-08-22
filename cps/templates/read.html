@@ -67,19 +67,13 @@
         <div id="divider"></div>
         <div id="prev" class="arrow">‹</div>
         <div id="viewer"></div>
-        <!-- NUEVO barra audio
-        <div id="progress-container">
-            <span id="current-time">00:00</span>
-            <input type="range" id="progress-bar" value="0" min="0" max="100">
-            <span id="total-time">00:00</span>
-        </div>-->
         <!-- NUEVO barra progreso audio -->
         <div id="progress-container">
             <a id="audio-toggle" class="audio-control">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M11.536 14.01a.5.5 0 0 1-.607-.276c-.141-.326-.518-.474-.787-.27-.269.205-.36.61-.278.96a.5.5 0 1 1-.975.216c-.17-.723.061-1.42.598-1.86.537-.44 1.294-.572 1.832-.379.54.192.872.693.806 1.262a.5.5 0 0 1-.539.527zm.982-2.606a.5.5 0 0 1-.682.18 3.506 3.506 0 0 0-1.784-.472 3.502 3.502 0 0 0-1.761.472.5.5 0 1 1-.522-.853 4.501 4.501 0 0 1 4.497 0 .5.5 0 0 1 .252.673zm1.717-2.55a.5.5 0 0 1-.696.178 5.493 5.493 0 0 0-2.65-.67 5.493 5.493 0 0 0-2.668.67.5.5 0 0 1-.502-.86 6.498 6.498 0 0 1 3.17-.798c1.07 0 2.107.233 3.15.684a.5.5 0 0 1 .196.796zm1.665-2.687a.5.5 0 0 1-.693.178 7.496 7.496 0 0 0-3.64-.903 7.5 7.5 0 0 0-3.655.903.5.5 0 1 1-.526-.853 8.496 8.496 0 0 1 4.166-1.032c1.306 0 2.582.34 3.853 1.025a.5.5 0 0 1 .195.782z"/>
-                    <path d="M8.224 2.926c.58-.553 1.402-.926 2.25-.926h.011c.487 0 .954.148 1.342.39.389.243.775.633.775 1.117v8.184c0 .496-.378.883-.77 1.127-.393.243-.86.384-1.348.384-.844 0-1.674-.376-2.245-.936a1.587 1.587 0 0 0-1.026-.396H4.732a.5.5 0 0 1-.474-.684l.563-1.27c.168-.38.218-.82.137-1.238-.08-.419-.271-.812-.561-1.12l-.523-.55a.5.5 0 0 1-.063-.66l.73-.73a.5.5 0 0 1 .724-.072l.857.76c.314.276.597.603.8.98.204.376.36.788.47 1.213l.394 1.665H8.25c.575 0 1.097-.208 1.473-.582z"/>
-                </svg>
+                <img id="play-button" src="{{ url_for('static', filename='img/play-button.png') }}" alt="Play" style="width: 150%; height: auto; margin-bottom: 2px; margin-left: 2px;" />
+                <img id="pause-button" src="{{ url_for('static', filename='img/pause-button.png') }}" alt="Pause" style="display: none; width: 120%; height: auto; margin-left: 5px;" />
+                <!--<img src="{{ url_for('static', filename='img/play-button.png') }}" alt="Play" style="width: 150%; height: auto;" /> -->
+                
             </a>
             <span id="current-time">00:00</span>
             <input type="range" id="progress-bar" value="0" min="0" max="100">
@@ -284,7 +278,9 @@
         
             isSpeaking = true;
             isPaused = false;
-            document.getElementById("audio-toggle").classList.add("speaking");
+            document.getElementById("play-button").style.display = "none";
+            document.getElementById("pause-button").style.display = "block";
+            //document.getElementById("audio-toggle").classList.add("speaking");
         
             utterance.onboundary = function(event) {
                 if (event.name === 'word') {
@@ -296,7 +292,9 @@
                 isSpeaking = false;
                 isPaused = false;
                 currentTextIndex = 0;
-                document.getElementById("audio-toggle").classList.remove("speaking");
+                document.getElementById("play-button").style.display = "block";
+                document.getElementById("pause-button").style.display = "none";
+                //document.getElementById("audio-toggle").classList.remove("speaking");
             };
         
             synth.speak(utterance);
@@ -308,14 +306,23 @@
                 synth.cancel();
                 isPaused = true;
                 isSpeaking = false;
-                document.getElementById("audio-toggle").classList.remove("speaking");
+                document.getElementById("play-button").style.display = "block";
+                document.getElementById("pause-button").style.display = "none";
+                //document.getElementById("audio-toggle").classList.remove("speaking");
                 pauseProgress();
             } else if (isPaused) {
                 startReading();
             }
         }
         
-        document.getElementById("audio-toggle").addEventListener("click", startReading);
+        //document.getElementById("audio-toggle").addEventListener("click", startReading);
+        document.getElementById("audio-toggle").addEventListener("click", function() {
+            if (isSpeaking) {
+                pauseReading();
+            } else {
+                startReading();
+            }
+        });
         
         document.getElementById('progress-bar').addEventListener('input', function(event) {
             const newTime = (event.target.value / 100) * totalTime;
