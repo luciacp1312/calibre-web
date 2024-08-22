@@ -4,12 +4,12 @@
     {% if result %}
         {% for book in result %}
             <div class="row book-detail">
-                <div class="col-sm-3 col-lg-3 col-xs-5">
-                    <div class="cover" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <div class="col-sm-3 col-lg-3 col-xs-5 d-flex align-items-center" style="margin-top: 10px;">
+                    <div class="cover" style="display: flex; justify-content: center; height: 250px;">
                         <img id="detailcover" class="centered-cover" title="{{ book.title }}" src="{{ book.thumbnail }}" alt="{{ book.title }}" onerror="this.onerror=null;this.src='/static/default-cover.jpg';">
                     </div>
-                </div>
-                <div class="col-sm-9 col-lg-9 book-meta">
+                </div>                
+                <div class="col-sm-9 col-lg-9 book-meta" style="border: 1px solid #ddd; background-color: #fff; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
                     <h2 id="title">{{ book.title }}</h2>
                     <p class="author">{{ book.author }}</p>
                     <p><strong>ISBN:</strong> {{ book.isbn }}</p>
@@ -31,12 +31,6 @@
 {% endblock %}
 
 <style>
-    .cover {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
     
     .centered-cover {
         max-width: 100%;

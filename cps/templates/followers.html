@@ -5,36 +5,48 @@
     <div class="row">
         <div class="col-md-8 offset-md-2">
             <h2 class="text-center mb-4">Usuarios que te siguen</h2>
-            <ul class="list-unstyled">
-                {% for user in users %}
-                    <li class="mb-3" style="background-color: #f8f9fa; border-radius: 10px; padding: 10px 20px; max-width: 500px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-                        <!-- Contenedor para el icono del usuario -->
-                        <div class="d-flex align-items-center" style="margin-right: 20px;">
-                            <img src="{{ url_for('static', filename='default_user_icon.png') }}" alt="User Icon" class="rounded-circle" style="width: 50px; height: 50px;">
-                        </div>
 
-                        <!-- Contenedor para el nombre del usuario -->
-                        <div class="flex-grow-1" style="margin-right: 20px;">
-                            <a href="{{ url_for('user_profile', username=user.name) }}" class="text-dark" style="font-weight: bold; font-size: 1.2em;">
-                                {{ user.name }}
-                            </a>
-                        </div>
+            <div style="height: 20px;"></div>
 
-                        <!-- Contenedor para el botón -->
-                        <div>
-                            {% if current_user.is_following(user) %}
-                                <form action="{{ url_for('unfollow', username=user.name) }}" method="get" class="mb-0">
-                                    <button type="submit" class="btn btn-secondary" style="background-color: #45b29d; color: white;">Dejar de seguir</button>
-                                </form>
-                            {% else %}
-                                <form action="{{ url_for('follow', username=user.name) }}" method="get" class="mb-0">
-                                    <button type="submit" class="btn btn-secondary" style="background-color: #45b29d; color: white;">Seguir</button>
-                                </form>
-                            {% endif %}
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
+            {% if users %}
+                <ul class="list-unstyled">
+                    {% for user in users %}
+                        <li class="mb-4" style="background-color: #f8f9fa; border-radius: 10px; padding: 10px 20px; max-width: 500px; margin: 10px auto; display: flex; align-items: center; justify-content: center; border: 1px solid #e0e0e0;">
+                            <!-- Contenedor para el icono del usuario -->
+                            <div class="d-flex align-items-center" style="margin-right: 20px;">
+                                <img src="{{ url_for('static', filename='default_user_icon.png') }}" alt="User Icon" class="rounded-circle" style="width: 50px; height: 50px;">
+                            </div>
+
+                            <!-- Contenedor para el nombre del usuario -->
+                            <div class="flex-grow-1" style="margin-right: 20px;">
+                                <a href="{{ url_for('user_profile', username=user.name) }}" class="text-dark" style="font-weight: bold; font-size: 1.2em;">
+                                    {{ user.name }}
+                                </a>
+                            </div>
+
+                            <!-- Contenedor para el botón -->
+                            <div>
+                                {% if current_user.is_following(user) %}
+                                    <form action="{{ url_for('unfollow', username=user.name) }}" method="get" class="mb-0">
+                                        <input type="hidden" name="next" value="{{ url_for('followers') }}">
+                                        <button type="submit" class="btn btn-secondary" style="background-color: #45b29d; color: white;">Dejar de seguir</button>
+                                    </form>
+                                {% else %}
+                                    <form action="{{ url_for('follow', username=user.name) }}" method="get" class="mb-0">
+                                        <input type="hidden" name="next" value="{{ url_for('followers') }}">
+                                        <button type="submit" class="btn btn-secondary" style="background-color: #45b29d; color: white;">Seguir</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-center" style="color: #555; padding: 20px 0;">No tienes seguidores</p>
+            {% endif %}
+
+            <div style="height: 20px;"></div>
+
             <div class="text-center mt-4">
                 <a href="{{ url_for('web.profile') }}" class="btn btn-secondary">Volver al perfil</a>
             </div>

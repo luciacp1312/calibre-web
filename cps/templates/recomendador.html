@@ -5,36 +5,31 @@
     <div class="row">
         <div class="col-md-8 offset-md-2">
             <h1 class="text-center mb-4">Recomendador</h1>
+            
+            <div style="height: 20px;"></div>
+            
             {% if not result %}
                 <form method="POST" action="{{ url_for('recomendaciones') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     {% for question_id, question in questions.items() %}
                         <div class="form-group">
-                            <label>{{ question['text'] }}</label>
-                            {% for idx, option in question['options'].items() %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="question_{{ question_id }}" value="{{ idx }}" required>
-                                    <label class="form-check-label">{{ option }}</label>
-                                </div>
-                            {% endfor %}
+                            <div class="question-container" style="border: 1px solid #ddd; background-color: #fff; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                
+                                <h4 class="question-text" style="font-size: 1.5rem; font-weight: bold;">{{ question['text'] }}</h4>
+                                {% for idx, option in question['options'].items() %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="question_{{ question_id }}" value="{{ idx }}" required>
+                                        <label class="form-check-label" style="font-weight: normal;">{{ option }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
                         </div>
                     {% endfor %}
+                    
+                    <div style="height: 20px;"></div>
+
                     <button type="submit" class="btn btn-primary" style="background-color: #45b29d; border-color: #45b29d;">Enviar</button>
                 </form>
-            {% else %}
-                <h2>Te recomendamos los siguientes libros:</h2>
-                <ul>
-                    {% for book in result %}
-                        <li>
-                            <h3>{{ book.title }}</h3>
-                            <p>Autor: {{ book.author }}</p>
-                            <p>Descripción: {{ book.description }}</p>
-                            <p>Publicado en: {{ book.publishedDate }}</p>
-                            <img src="{{ book.thumbnail }}" alt="{{ book.title }}">
-                        </li>
-                    {% endfor %}
-                </ul>
-                <a href="{{ url_for('recomendador', reset=True) }}" class="btn btn-secondary">Volver al cuestionario</a>
             {% endif %}
         </div>
     </div>

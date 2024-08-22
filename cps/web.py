@@ -1898,7 +1898,7 @@ def delete_message(message_id):
 @app.route('/notifications', methods=['GET'])
 @login_required
 def notifications():
-    notifications = ub.session.query(ub.Notification).filter(ub.Notification.user_id == current_user.id).all()
+    notifications = ub.session.query(ub.Notification).filter(ub.Notification.user_id == current_user.id).order_by(ub.Notification.timestamp.desc()).all()
     
     # Procesar los datos de las notificaciones
     processed_notifications = []
@@ -1919,7 +1919,7 @@ def notifications():
 
         processed_notifications.append(notification)
 
-    return render_title_template('notifications.html', notifications=processed_notifications, title="Notifications", page='notifications')
+    return render_title_template('notifications.html', notifications=processed_notifications, title="Notificaciones", page='notifications')
 
 @app.route('/notifications/delete_all', methods=['POST'])
 @login_required
@@ -1960,13 +1960,17 @@ def follow(username):
     notification = ub.Notification(
         user_id=user.id,
         message=f"{current_user.name} ha comenzado a seguirte.",
-        #sender_id=current_user.id  # Asegúrate de tener este campo en tu modelo Notification
     )
     ub.session.add(notification)
     ub.session.commit()
     
     flash('You are now following {}!'.format(username))
-    return redirect(url_for('user_profile', username=username))
+    
+    next_page = request.args.get('next')
+    if next_page:
+        return redirect(next_page)
+    else:
+        return redirect(url_for('user_profile', username=username))
 
 @app.route('/unfollow/<username>', methods=['GET'])
 @login_required
@@ -1978,10 +1982,16 @@ def unfollow(username):
     if user == current_user:
         flash('You cannot unfollow yourself!')
         return redirect(url_for('user_profile', username=username))
+    
     current_user.unfollow(user)
     ub.session.commit()
     flash('You have unfollowed {}.'.format(username))
-    return redirect(url_for('user_profile', username=username))
+    
+    next_page = request.args.get('next')
+    if next_page:
+        return redirect(next_page)
+    else:
+        return redirect(url_for('user_profile', username=username))
 
 
 @app.route('/following')
