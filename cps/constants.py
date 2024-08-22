@@ -98,9 +98,6 @@ SIDEBAR_FORMAT          = 1 << 14
 SIDEBAR_ARCHIVED        = 1 << 15
 SIDEBAR_DOWNLOAD        = 1 << 16
 SIDEBAR_LIST            = 1 << 17
-#################################### NUEVO recomendador ####################################
-SIDEBAR_RECOMMENDER     = 1 << 18
-#################################### NUEVO recomendador ####################################
 
 sidebar_settings = {
                 "detail_random": DETAIL_RANDOM,
@@ -119,9 +116,6 @@ sidebar_settings = {
                 "sidebar_archived": SIDEBAR_ARCHIVED,
                 "sidebar_download": SIDEBAR_DOWNLOAD,
                 "sidebar_list": SIDEBAR_LIST,
-#################################### NUEVO recomendador ####################################
-                "sidebar_recommender": SIDEBAR_RECOMMENDER
-#################################### NUEVO recomendador ####################################
             }
 
 

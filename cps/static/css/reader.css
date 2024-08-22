@@ -63,7 +63,6 @@
 #total-time {
     font-size: 14px;
     margin: 0 10px;
-    /*color: #333;*/
     font-family: Arial, sans-serif;
 }
 
@@ -74,7 +73,6 @@
     background: black;
 }
 
-/* NUEVO */
 #audio-toggle {
     margin-right: 10px;
     cursor: pointer;
@@ -82,13 +80,4 @@
     align-items: center;
     width: 15px; 
     height: 15px;
-}
-
-#audio-toggle i {
-    font-size: 24px;
-}
-
-#audio-toggle svg {
-    width: 24px;
-    height: 24px;
 }

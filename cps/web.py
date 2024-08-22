@@ -2010,7 +2010,7 @@ def followers():
     return render_title_template('followers.html', users=users, title="Followers", page='followers')
 
 
-@app.route('/search', methods=['GET'])
+@app.route('/searchFollow', methods=['GET'])
 @login_required
 def search():
     query = request.args.get('q', '')

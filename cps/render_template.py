@@ -101,14 +101,6 @@ def get_sidebar_config(kwargs=None):
             {"glyph": "glyphicon-th-list", "text": _('Books List'), "link": 'web.books_table', "id": "list",
              "visibility": constants.SIDEBAR_LIST, 'public': (not current_user.is_anonymous), "page": "list",
              "show_text": _('Show Books List'), "config_show": content})
-    #################################### NUEVO recomendador ####################################
-    #print(f"Visibilidad del recomendador: {current_user.check_visibility(constants.SIDEBAR_RECOMMENDER)}")
-    #print("Sidebar Configuración:", sidebar)
-    sidebar.append(
-        {"glyph": "glyphicon-thumbs-up", "text": _('Recomendador'), "link": 'recomendador', "id": "recomendador",
-         "visibility": constants.SIDEBAR_RECOMMENDER, 'public': True, "page": "recomendador",
-         "show_text": _('Show Recommender'), "config_show": True})
-    #################################### NUEVO recomendador ####################################
 
     
     g.shelves_access = ub.session.query(ub.Shelf).filter(
