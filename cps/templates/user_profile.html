@@ -23,16 +23,16 @@
                 <div class="follow-button">
                     {% if current_user.is_following(user) %}
                         <form action="{{ url_for('unfollow', username=user.name) }}" method="get" style="display:inline;">
-                            <button type="submit" class="btn btn-primary">Dejar de seguir</button>
+                            <button type="submit" class="btn btn-primary" style="background-color: #45b29d; border-color: #45b29d;">Dejar de seguir</button>
                         </form>
                     {% else %}
                         <form action="{{ url_for('follow', username=user.name) }}" method="get" style="display:inline;">
-                            <button type="submit" class="btn btn-primary">Seguir</button>
+                            <button type="submit" class="btn btn-primary" style="background-color: #45b29d; border-color: #45b29d;">Seguir</button>
                         </form>
                     {% endif %}
                 </div>
                 <div class="chat-button">
-                    <a href="{{ url_for('chat', user_id=user.id) }}" class="btn btn-primary">Abrir Chat</a>
+                    <a href="{{ url_for('chat', user_id=user.id) }}" class="btn btn-primary" style="background-color: #45b29d; border-color: #45b29d;">Abrir Chat</a>
                 </div>
             {% endif %}
 
