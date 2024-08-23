@@ -38,23 +38,13 @@ from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.sql.functions import coalesce
 
 ############################### NUEVO ###############################
-from flask import send_file, flash, redirect, url_for, request
-from gtts import gTTS
-import ebooklib
-from ebooklib import epub
-from bs4 import BeautifulSoup
-#import pyttsx3
+from flask import flash, redirect, url_for, request
 import os
 from . import web
-from sqlalchemy import exc, null
-from . import config_sql
-from io import BytesIO
 from flask import jsonify
-import zipfile
 from .recomendador import *
 from cps.db import Answer
 from cps.ub import ForumCategory, Forum, Thread, Post
-from .helper import get_epub_path
 ############################### NUEVO ###############################
 
 from werkzeug.datastructures import Headers
@@ -1267,7 +1257,6 @@ def download_link(book_id, book_format, anyname):
 
 #################################### NUEVO recomendador ####################################
 def render_recomendador(page, book_id=None, order=['default', 'order'], result=None):
-    #if current_user.check_visibility(constants.SIDEBAR_RECOMMENDER):
     if order is None:
         order = ['default', 'order']
         
@@ -1279,8 +1268,6 @@ def render_recomendador(page, book_id=None, order=['default', 'order'], result=N
         page="recomendador",
         order=order[1]
     )
-    #else:
-        #abort(404)
 
 @app.route('/recomendador', methods=['GET', 'POST'])
 @login_required
@@ -1386,7 +1373,6 @@ def recomendaciones():
     return render_title_template(
         'detail_recomendador.html',
         result=result,
-        # questions=questions,
         title="Recomendador")
     
 #################################### NUEVO recomendador ####################################
@@ -1855,7 +1841,7 @@ def chat(user_id):
         return redirect(url_for('user_profile', user_id=current_user.id))
 
     if request.method == 'POST':
-        content = request.form.get('content')  # Usa .get() para evitar errores si 'content' no está presente
+        content = request.form.get('content')
         if content:
             message = ub.Message(sender_id=current_user.id, receiver_id=other_user.id, content=content)
             ub.session.add(message)

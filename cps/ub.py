@@ -240,11 +240,9 @@ class Notification(Base):
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
     is_read = Column(Boolean, default=False)
     post_id = Column(Integer, ForeignKey('posts.id'))
-    #sender_id = Column(Integer, ForeignKey('user.id'))  # Agregado para almacenar el ID del remitente
 
     post = relationship('Post', back_populates='notifications')
     user = relationship('User', foreign_keys=[user_id], backref='notifications')
-    #sender = relationship('User', foreign_keys=[sender_id])
     
     def __repr__(self):
         return f"<Notification {self.message}>"
@@ -290,16 +288,13 @@ class User(UserBase, Base):
     view_settings = Column(JSON, default={})
     kobo_only_shelves_sync = Column(Integer, default=0)
     
-    #################################### NUEVO recomendador relación ####################################
+    #################################### NUEVO relaciones ####################################
     answers = relationship('Answer', back_populates='user')
-    #################################### NUEVO recomendador relación ####################################
-    #################################### NUEVO foro relaciones ####################################
     threads = relationship('db.Thread', order_by='Thread.id', back_populates='user')
     posts = relationship('db.Post', order_by='Post.id', back_populates='user')
-    #################################### NUEVO foro relaciones ####################################
-    #################################### NUEVO red social ####################################
-    following_associations = relationship('UserFollow', foreign_keys='UserFollow.follower_id', back_populates='follower', cascade='all, delete-orphan') #, overlaps="follower,following"
-    follower_associations = relationship('UserFollow', foreign_keys='UserFollow.followed_id', back_populates='followed', cascade='all, delete-orphan') #, overlaps="followed,followers"
+    following_associations = relationship('UserFollow', foreign_keys='UserFollow.follower_id', back_populates='follower', cascade='all, delete-orphan')
+    follower_associations = relationship('UserFollow', foreign_keys='UserFollow.followed_id', back_populates='followed', cascade='all, delete-orphan')
+    #################################### NUEVO relaciones ####################################
     
     def follow(self, user):
         if not self.is_following(user):

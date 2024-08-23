@@ -20,12 +20,6 @@ import os
 import sys
 import json
 
-'''################################ NUEVO foro ################################
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from .db import Base
-################################ NUEVO foro ################################
-'''
 from sqlalchemy import Column, String, Integer, SmallInteger, Boolean, BLOB, JSON
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.expression import text
@@ -46,20 +40,6 @@ from .subproc_wrapper import process_wait
 log = logger.create()
 _Base = declarative_base()
 
-'''################################ NUEVO foro ################################
-# Suponiendo que tienes una URL de base de datos en una variable de entorno
-#DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///mydatabase.db')
-DATABASE_URL = 'sqlite:///:memory:'
-
-engine = create_engine(DATABASE_URL, convert_unicode=True)
-db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
-
-#Base.metadata.bind = engine
-Base.metadata.create_all(bind=engine)
-# A lo mejor tengo que poner _Base en vez de Base.
-# Hay un metadata.create_all abajo, en caso de que haya colisión
-################################ NUEVO foro ################################
-'''
 class _Flask_Settings(_Base):
     __tablename__ = 'flask_settings'
 

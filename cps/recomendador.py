@@ -153,8 +153,8 @@ def pregunta(question, answer):
     questions_left = list(set(questions.keys()) - set(questions_so_far))
     if len(questions_left) == 0:
         result = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]
-        questions_so_far = [] # nuevo
-        answers_so_far = [] # nuevo
+        questions_so_far = []
+        answers_so_far = []
         return None, None, result['name']
     else:
         next_question = random.choice(questions_left)
