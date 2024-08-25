@@ -36,6 +36,18 @@
                 </div>
             {% endif %}
 
+            <!-- Nueva sección para los botones de Seguidos y Seguidores -->
+            <div class="follow-button">
+                <a href="{{ url_for('following', username=user.name) }}" class="btn btn-primary mx-2" style="background-color: #45b29d; border-color: #45b29d;">Seguidos</a>
+                <a href="{{ url_for('followers', username=user.name) }}" class="btn btn-primary mx-2" style="background-color: #45b29d; border-color: #45b29d;">Seguidores</a>
+            </div>
+
+            {% if current_user == user %}
+                <div class="follow-button">
+                    <a href="{{ url_for('web.profile') }}" class="btn btn-primary mx-2" style="background-color: #45b29d; border-color: #45b29d;">Editar Perfil</a>
+                </div>               
+            {% endif %}
+            
             <!-- Espacio entre el botón y la sección de libros descargados -->
             <div class="books-section">
                 <h3>Libros Descargados</h3>
@@ -76,9 +88,6 @@
                 {% endfor %}
             </ul>
 
-            {% if current_user == user %}
-                <a href="{{ url_for('web.profile') }}" class="btn btn-primary" style="background-color: #45b29d; border-color: #45b29d;">Editar Perfil</a>
-            {% endif %}
         </div>
     </div>
 </div>

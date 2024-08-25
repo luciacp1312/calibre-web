@@ -1979,22 +1979,25 @@ def unfollow(username):
     else:
         return redirect(url_for('user_profile', username=username))
 
-
-@app.route('/following')
+@app.route('/following/<username>')
 @login_required
-def following():
-    following_ids = [assoc.followed_id for assoc in current_user.following_associations]
+def following(username):
+    user = ub.session.query(ub.User).filter_by(name=username).first()
+    if user is None:
+        abort(404)  # Lanzar un error 404 si el usuario no se encuentra
+    following_ids = [assoc.followed_id for assoc in user.following_associations]
     users = ub.session.query(ub.User).filter(ub.User.id.in_(following_ids)).all()
-    return render_title_template('following.html', users=users, title="Following", page='following')
+    return render_title_template('following.html', users=users, title=f"Seguidos por {user.name}", page='following', current_user_name=username)
 
-  
-@app.route('/followers')
+@app.route('/followers/<username>')
 @login_required
-def followers():
-    follower_ids = [assoc.follower_id for assoc in current_user.follower_associations]
+def followers(username):
+    user = ub.session.query(ub.User).filter_by(name=username).first()
+    if user is None:
+        abort(404)  # Lanzar un error 404 si el usuario no se encuentra
+    follower_ids = [assoc.follower_id for assoc in user.follower_associations]
     users = ub.session.query(ub.User).filter(ub.User.id.in_(follower_ids)).all()
-    return render_title_template('followers.html', users=users, title="Followers", page='followers')
-
+    return render_title_template('followers.html', users=users, title=f"Seguidores de {user.name}", page='followers', current_user_name=username)
 
 @app.route('/searchFollow', methods=['GET'])
 @login_required

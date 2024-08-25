@@ -27,7 +27,7 @@
                             <!-- Contenedor para el botón -->
                             <div>
                                 <form action="{{ url_for('unfollow', username=user.name) }}" method="get" class="mb-0">
-                                    <input type="hidden" name="next" value="{{ url_for('following') }}">
+                                    <input type="hidden" name="next" value="{{ url_for('following', username=current_user_name) }}">
                                     <button type="submit" class="btn btn-secondary" style="background-color: #45b29d; color: white;">Dejar de seguir</button>
                                 </form>
                             </div>
@@ -41,7 +41,7 @@
             <div style="height: 20px;"></div>
 
             <div class="text-center mt-4">
-                <a href="{{ url_for('web.profile') }}" class="btn btn-secondary">Volver al perfil</a>
+                <a href="{{ url_for('user_profile', username=current_user_name) }}" class="btn btn-secondary">Volver al perfil</a>
             </div>
         </div>
     </div>
