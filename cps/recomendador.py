@@ -115,30 +115,30 @@ answers_so_far = []
 # Funciones de cálculo
 def calculate_probabilities(questions_so_far, answers_so_far):
     probabilities = []
-    for character in books:
+    for book in books:
         probabilities.append({
-            'name': character['name'],
-            'probability': calculate_character_probability(character, questions_so_far, answers_so_far)
+            'name': book['name'],
+            'probability': calculate_book_probability(book, questions_so_far, answers_so_far)
         })
     return probabilities
 
-def calculate_character_probability(character, questions_so_far, answers_so_far):
-    P_character = 1 / len(books)
-    P_answers_given_character = 1
-    P_answers_given_not_character = 1
+def calculate_book_probability(book, questions_so_far, answers_so_far):
+    P_book = 1 / len(books)
+    P_answers_given_book = 1
+    P_answers_given_not_book = 1
     for question, answer in zip(questions_so_far, answers_so_far):
-        P_answers_given_character *= max(1 - abs(answer - character_answer(character, question)), 0.01)
-        P_answer_not_character = np.mean([1 - abs(answer - character_answer(not_character, question))
-                                          for not_character in books
-                                          if not_character['name'] != character['name']])
-        P_answers_given_not_character *= max(P_answer_not_character, 0.01)
-    P_answers = P_character * P_answers_given_character + (1 - P_character) * P_answers_given_not_character
-    P_character_given_answers = (P_answers_given_character * P_character) / P_answers
-    return P_character_given_answers
+        P_answers_given_book *= max(1 - abs(answer - book_answer(book, question)), 0.01)
+        P_answer_not_book = np.mean([1 - abs(answer - book_answer(not_book, question))
+                                          for not_book in books
+                                          if not_book['name'] != book['name']])
+        P_answers_given_not_book *= max(P_answer_not_book, 0.01)
+    P_answers = P_book * P_answers_given_book + (1 - P_book) * P_answers_given_not_book
+    P_book_given_answers = (P_answers_given_book * P_book) / P_answers
+    return P_book_given_answers
 
-def character_answer(character, question):
-    if question in character['answers']:
-        return character['answers'][question]
+def book_answer(book, question):
+    if question in book['answers']:
+        return book['answers'][question]
     return 0.5
 
 def pregunta(question, answer):

@@ -1318,7 +1318,6 @@ def recomendaciones():
         if answers:
             ub.session.bulk_save_objects(answers)
         ub.session.commit()
-        flash("Respuestas guardadas con éxito.", category="success")
 
     except ValueError:
         flash("Hubo un error al procesar sus respuestas. Asegúrese de que todas las respuestas son válidas.", category="error")
@@ -1345,12 +1344,10 @@ def recomendaciones():
         book_info = get_book_info(title=book_name)
         if book_info:
             result.append({
-                #'id': book_info.id,
                 'title': book_info['title'],
                 'author': book_info['author'],
                 'isbn': book_info['isbn'],
                 'description': book_info['description'],
-                #'publisher': book_info['publication_info'],
                 'publishedDate': book_info['publication_info'],
                 'pageCount': book_info['page_count'],
                 'language': book_info['language'],
@@ -1402,12 +1399,12 @@ def get_book_info(isbn=None, title=None):
         return None
     
     book = items[0]['volumeInfo']
-    title = book.get('title', 'Unknown')
-    author = ', '.join(book.get('authors', ['Unknown']))
-    publication_info = book.get('publishedDate', 'Unknown')
-    description = book.get('description', 'No description available.')
-    page_count = book.get('pageCount', 'Unknown')
-    language = book.get('language', 'Unknown')
+    title = book.get('title', 'Desconocido')
+    author = ', '.join(book.get('authors', ['Desconocido']))
+    publication_info = book.get('publishedDate', 'Desconocido')
+    description = book.get('description', 'No hay descripción disponible.')
+    page_count = book.get('pageCount', 'Desconocido')
+    language = book.get('language', 'Desconocido')
     thumbnail = book.get('imageLinks', {}).get('thumbnail', 'https://via.placeholder.com/150x220?text=No+Image')
 
     # Obtener ISBN
@@ -1440,12 +1437,12 @@ def get_book_info(isbn=None, title=None):
 @login_required
 def delete_forum(forum_id):
     if not current_user.role_admin():
-        flash('Unauthorized access!', 'danger')
+        flash('¡Acceso no autorizado!', 'danger')
         return redirect(url_for('manage_forums'))
     
     forum = ub.session.query(ub.Forum).get(forum_id)
     if not forum:
-        flash('Forum not found!', 'danger')
+        flash('¡Foro no encontrado!', 'danger')
         return redirect(url_for('manage_forums'))
     
     try:
@@ -1464,10 +1461,10 @@ def delete_forum(forum_id):
         # Eliminar el foro
         ub.session.delete(forum)
         ub.session.commit()
-        flash('Forum deleted successfully!', 'success')
+        flash('¡Foro eliminado con éxito!', 'success')
     except Exception as e:
         ub.session.rollback()
-        flash('There was an error deleting the forum. Please try again.', 'danger')
+        flash('Ha ocurrido un error al borrar el foro. Por favor, inténtelo de nuevo.', 'danger')
     
     return redirect(url_for('manage_forums'))
 
@@ -1476,12 +1473,12 @@ def delete_forum(forum_id):
 @login_required
 def delete_thread(thread_id):
     if not current_user.role_admin():
-        flash('You do not have permission to delete threads.', 'danger')
+        flash('No tienes permiso para borrar hilos.', 'danger')
         return redirect(url_for('view_forum'))
     
     thread = ub.session.query(ub.Thread).get(thread_id)
     if not thread:
-        flash('Thread not found!', 'danger')
+        flash('¡Hilo no encontrado!', 'danger')
         return redirect(url_for('view_forum'))
     
     try:
@@ -1493,10 +1490,10 @@ def delete_thread(thread_id):
         # Eliminar el thread
         ub.session.delete(thread)
         ub.session.commit()
-        flash('Thread and its posts deleted successfully!', 'success')
+        flash('El hilo y sus comentarios han sido eliminados con éxito!', 'success')
     except Exception as e:
         ub.session.rollback()
-        flash('There was an error deleting the thread. Please try again.', 'danger')
+        flash('Ha ocurrido un error al borrar el hilo. Por favor, inténtelo de nuevo.', 'danger')
     
     return redirect(url_for('view_forum', forum_id=thread.forum_id))
 
@@ -1505,22 +1502,22 @@ def delete_thread(thread_id):
 @login_required
 def delete_post(post_id):
     if not current_user.role_admin():
-        flash('Unauthorized access!', 'danger')
+        flash('¡Acceso no autorizado!', 'danger')
         return redirect(url_for('manage_posts'))
     
     post = ub.session.query(ub.Post).get(post_id)
     if not post:
-        flash('Post not found!', 'danger')
+        flash('¡Comentario no encontrado!', 'danger')
         return redirect(url_for('manage_posts'))
     
     thread_id = post.thread_id
     try:
         ub.session.delete(post)
         ub.session.commit()
-        flash('Post deleted successfully!', 'success')
+        flash('¡Comentario eliminado con éxito!', 'success')
     except Exception as e:
         ub.session.rollback()
-        flash('There was an error deleting the post. Please try again.', 'danger')
+        flash('Ha ocurrido un error al borrar el comentario. Por favor, inténtelo de nuevo.', 'danger')
     
     return redirect(url_for('view_thread', thread_id=thread_id))
 
@@ -1538,19 +1535,19 @@ def create_default_category():
         return new_category
     except Exception as e:
         ub.session.rollback()
-        raise Exception('Error creating default category. Please try again.')
+        raise Exception('Ha ocurrido un error al crear la categoría por defecto. Por favor, inténtelo de nuevo.')
 
 # Ruta para eliminar una categoría
 @app.route('/categories/delete/<int:category_id>', methods=['POST'])
 @login_required
 def delete_category(category_id):
     if not current_user.role_admin():
-        flash('Unauthorized access!', 'danger')
+        flash('¡Acceso no autorizado!', 'danger')
         return redirect(url_for('manage_categories'))
     
     category = ub.session.query(ub.ForumCategory).get(category_id)
     if not category:
-        flash('Category not found!', 'danger')
+        flash('¡Categoría no encontrada!', 'danger')
         return redirect(url_for('manage_categories'))
 
     # Obtener o crear la categoría por defecto
@@ -1562,7 +1559,7 @@ def delete_category(category_id):
             # Volver a buscar la categoría por defecto después de la creación
             default_category = ub.session.query(ub.ForumCategory).filter_by(name='Sin Categoría').first()
         except Exception as e:
-            flash('Error creating default category. Please try again.', 'danger')
+            flash('Ha ocurrido un error al crear la categoría por defecto. Por favor, inténtelo de nuevo.', 'danger')
             return redirect(url_for('manage_categories'))
 
     try:
@@ -1574,12 +1571,12 @@ def delete_category(category_id):
         ub.session.commit()
         
         if affected_forums:
-            flash('Category deleted successfully and affected forums updated!', 'success')
+            flash('¡Categoría eliminada con éxito y foros afectados actualizados!', 'success')
         else:
-            flash('Category deleted successfully!', 'success')
+            flash('¡Categoría eliminada con éxito!', 'success')
     except Exception as e:
         ub.session.rollback()
-        flash('There was an error deleting the category. Please try again.', 'danger')
+        flash('Ha ocurrido un error al borrar la categoría. Por favor, inténtelo de nuevo.', 'danger')
     
     return redirect(url_for('manage_categories'))
 
@@ -1604,16 +1601,16 @@ def add_category():
         description = request.form.get('description', '')
 
         if not name:
-            flash('Name is required!', 'danger')
+            flash('¡Nombre requerido!', 'danger')
             return redirect(url_for('add_category'))
 
         try:
             category = ub.ForumCategory(name=name, description=description)
             ub.session.add(category)
             ub.session.commit()
-            flash('Category added successfully!', 'success')
+            flash('¡Categoría agregada con éxito!', 'success')
         except Exception as e:
-            flash('There was an error adding the category. Please try again.', 'danger')
+            flash('Ha ocurrido un error al agregar la categoría. Por favor, inténtelo de nuevo.', 'danger')
             return redirect(url_for('add_category'))
         
         return redirect(url_for('manage_forums'))  # Redirigir a /forums después de agregar la categoría
@@ -1644,7 +1641,7 @@ def add_forum():
         forum = ub.Forum(name=name, description=description, category_id=category_id)
         ub.session.add(forum)
         ub.session.commit()
-        flash('Forum added successfully!', 'success')
+        flash('¡Foro agregado con éxito!', 'success')
         return redirect(url_for('manage_forums'))
     categories = ub.session.query(ub.ForumCategory).all()
     return render_title_template(
@@ -1659,7 +1656,7 @@ def add_forum():
 def edit_forum(forum_id):
     forum = ub.session.query(ub.Forum).get(forum_id)
     if not forum:
-        flash('Forum not found!', 'danger')
+        flash('¡Foro no encontrado!', 'danger')
         return redirect(url_for('manage_forums'))
     
     if request.method == 'POST':
@@ -1669,11 +1666,11 @@ def edit_forum(forum_id):
         
         try:
             ub.session.commit()
-            flash('Forum updated successfully!', 'success')
+            flash('¡Foro actualizado con éxito!', 'success')
             return redirect(url_for('manage_forums'))
         except Exception as e:
             ub.session.rollback()
-            flash('There was an error updating the forum. Please try again.', 'danger')
+            flash('Ha ocurrido un error al actualizar el foro. Por favor, inténtelo de nuevo.', 'danger')
     
     categories = ub.session.query(ub.ForumCategory).all()
     return render_title_template(
@@ -1691,7 +1688,7 @@ def edit_forum(forum_id):
 def view_forum(forum_id):
     forum = ub.session.query(ub.Forum).get(forum_id)
     if not forum:
-        flash('Forum not found!', 'danger')
+        flash('¡Foro no encontrado!', 'danger')
         return redirect(url_for('manage_forums'))
     threads = ub.session.query(ub.Thread).filter_by(forum_id=forum_id).all()
     return render_title_template(
@@ -1723,7 +1720,7 @@ def add_thread(forum_id):
     #forum_id = request.args.get('forum_id', None)
     forum = ub.session.query(ub.Forum).get(forum_id)
     if not forum:
-        flash('Forum not found!', 'danger')
+        flash('¡Foro no encontrado!', 'danger')
         return redirect(url_for('manage_forums'))
     
     if request.method == 'POST':
@@ -1739,14 +1736,12 @@ def add_thread(forum_id):
         ub.session.add(post)
         ub.session.commit()
         
-        flash('Thread and post added successfully!', 'success')
+        flash('¡Hilo y comentario añadidos con éxito!', 'success')
         return redirect(url_for('view_forum', forum_id=forum_id))
     
-    #forums = ub.session.query(ub.Forum).all()
     
     return render_title_template(
         'add_thread.html',
-        #forums=forums,
         forum=forum,
         forum_id=forum_id,
         title="Threads",
@@ -1759,7 +1754,7 @@ def add_thread(forum_id):
 def view_thread(thread_id):
     thread = ub.session.query(ub.Thread).get(thread_id)
     if not thread:
-        flash('Thread not found!', 'danger')
+        flash('¡Hilo no encontrado!', 'danger')
         return redirect(url_for('view_forum'))
     
     posts = ub.session.query(ub.Post).filter_by(thread_id=thread_id).order_by(ub.Post.created_at).all()
@@ -1796,7 +1791,7 @@ def manage_posts(thread_id):
 def add_post(thread_id):
     thread = ub.session.query(ub.Thread).get(thread_id)
     if not thread:
-        flash('Thread not found!', 'danger')
+        flash('¡Hilo no encontrado!', 'danger')
         return redirect(url_for('view_forum'))
 
     if request.method == 'POST':
@@ -1818,7 +1813,7 @@ def add_post(thread_id):
         
         ub.session.commit()
         
-        flash('¡Post añadido con éxito!', 'success')
+        flash('¡Post agregado con éxito!', 'success')
         return redirect(url_for('view_thread', thread_id=thread_id))
     
     return render_title_template(
@@ -1852,7 +1847,7 @@ def chat(user_id):
             ub.session.add(notification)
             
             ub.session.commit()
-            flash('Mensaje enviado!', 'success')
+            flash('¡Mensaje enviado!', 'success')
             return redirect(url_for('chat', user_id=user_id))
 
     # Obtener mensajes entre el usuario actual y el usuario con el que se chatea
@@ -1933,10 +1928,10 @@ def delete_notification(notification_id):
 def follow(username):
     user = ub.session.query(ub.User).filter(ub.User.name == username).first()
     if user is None:
-        flash('User {} not found.'.format(username))
+        flash('Usuario {} no encontrado.'.format(username))
         return redirect(url_for('web.index'))
     if user == current_user:
-        flash('You cannot follow yourself!')
+        flash('¡No puedes seguirte a ti mismo!')
         return redirect(url_for('user_profile', username=username))
     
     current_user.follow(user)
@@ -1950,7 +1945,7 @@ def follow(username):
     ub.session.add(notification)
     ub.session.commit()
     
-    flash('You are now following {}!'.format(username))
+    flash('¡Ahora sigues a {}!'.format(username))
     
     next_page = request.args.get('next')
     if next_page:
@@ -1963,15 +1958,15 @@ def follow(username):
 def unfollow(username):
     user = ub.session.query(ub.User).filter(ub.User.name == username).first()
     if user is None:
-        flash('User {} not found.'.format(username))
+        flash('Usuario {} no encontrado.'.format(username))
         return redirect(url_for('web.index'))
     if user == current_user:
-        flash('You cannot unfollow yourself!')
+        flash('¡No puedes seguirte a ti mismo!')
         return redirect(url_for('user_profile', username=username))
     
     current_user.unfollow(user)
     ub.session.commit()
-    flash('You have unfollowed {}.'.format(username))
+    flash('Has dejado de seguir a {}.'.format(username))
     
     next_page = request.args.get('next')
     if next_page:

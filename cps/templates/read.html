@@ -208,6 +208,7 @@
         }
         
         function startProgress() {
+            if (interval) clearInterval(interval); // Para asegurar que no haya otro intervalo
             interval = setInterval(updateProgress, 1000);
         }
         
@@ -249,14 +250,21 @@
                 console.error("No se encontró contenido para leer.");
                 return;
             }
+
+            let previousTotalTime = totalTime;
         
             totalTime = calculateTotalTime(textToRead);
             document.getElementById('total-time').textContent = formatTime(totalTime);
-        
-            currentTime = Math.max(currentTime, 0);
-            document.getElementById('current-time').textContent = formatTime(currentTime);
-            document.getElementById('progress-bar').value = (currentTime / totalTime) * 100;
-        
+            
+            if (totalTime !== previousTotalTime) { // Si ha cambiado, significa que se ha cambiado de capítulo
+                currentTime = 0;
+                currentTextIndex = 0;  // Reiniciar el índice de texto también
+                document.getElementById('current-time').textContent = formatTime(currentTime);
+                document.getElementById('progress-bar').value = (currentTime / totalTime) * 100;    
+            }
+
+            //currentTime = Math.max(currentTime, 0);
+    
             if (isSpeaking) {
                 pauseReading();
                 return;
@@ -338,7 +346,7 @@
         }
         
         document.querySelector("#next").addEventListener("click", logViewerContent);
-        document.querySelector("#prev").addEventListener("click", logViewerContent);    
+        document.querySelector("#prev").addEventListener("click", logViewerContent);
   </script>
   
 
