@@ -386,7 +386,7 @@ class Recommendation(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    result = Column(String, nullable=False)
+    result = Column(JSON, nullable=False)
     user = relationship("User", back_populates='recommendations')
     
     def __init__(self, user_id, result):

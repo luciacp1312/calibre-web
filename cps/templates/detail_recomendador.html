@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
 <div class="single">
+    <hr>
+    <div style="text-align: center;">
+        <a href="{{ url_for('recomendador', reset=True) }}" class="btn btn-primary mx-2" style="background-color: #45b29d; border-color: #45b29d;">Volver a realizar el test</a>
+    </div>
+    <hr>
     {% if result %}
         {% for book in result %}
             <div class="row book-detail">
@@ -31,7 +36,6 @@
 {% endblock %}
 
 <style>
-    
     .centered-cover {
         max-width: 100%;
         max-height: 100%;

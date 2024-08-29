@@ -1272,105 +1272,111 @@ def render_recomendador(page, book_id=None, order=['default', 'order'], result=N
 @app.route('/recomendador', methods=['GET', 'POST'])
 @login_required
 def recomendador():
+    user_id = current_user.id
+    recommendation = ub.session.query(ub.Recommendation).filter_by(user_id=user_id).first()
+
+    if recommendation and not request.args.get('reset'):
+        return redirect(url_for('recomendaciones'))
+    
     if request.method == 'POST':
         return redirect(url_for('recomendaciones'))
     
     # Si reset está a True, borrar las respuestas y la recomendación
     if request.args.get('reset'):
-        user_id = current_user.id
         ub.session.query(ub.Answer).filter_by(user_id=user_id).delete()
         ub.session.query(ub.Recommendation).filter_by(user_id=user_id).delete()
         ub.session.commit()
-        return render_recomendador(page=1, book_id=None, order=['default', 'order'])
         
-    else:
-        user_id = current_user.id
-        recommendation = ub.session.query(ub.Recommendation).filter_by(user_id=user_id).first()
+    return render_recomendador(page=1, book_id=None, order=['default', 'order'])
+   
 
-        if recommendation:
-            return render_recomendador(page=1, book_id=None, order=['default', 'order'], result=recommendation.result)
-        
-        return render_recomendador(page=1, book_id=None, order=['default', 'order'])
-        
 
-@app.route('/recomendaciones', methods=['POST'])
+@app.route('/recomendaciones', methods=['GET', 'POST'])
 @login_required
 def recomendaciones():
     user_id = current_user.id
-    answers = []
 
-    try:
-        for question_id in questions.keys():
-            answer = request.form.get(f'question_{question_id}')
-            if answer:
-                answer = float(answer)
-                
-                # Verificar si hay respuestas guardadas
-                existing_answer = ub.session.query(ub.Answer).filter_by(user_id=user_id, question_id=question_id).first()
-                if existing_answer:
-                    existing_answer.answer = answer # Actualizar la respuesta existente
-                else:
-                    # Crear una nueva respuesta
-                    new_answer = ub.Answer(user_id=user_id, question_id=question_id, answer=answer)
-                    answers.append(new_answer)
-                
-        # Guardar las respuestas en la base de datos
-        if answers:
-            ub.session.bulk_save_objects(answers)
+    if request.method == 'POST':
+        answers = []
+        try:
+            for question_id in questions.keys():
+                answer = request.form.get(f'question_{question_id}')
+                if answer:
+                    answer = float(answer)
+                    
+                    # Verificar si hay respuestas guardadas
+                    existing_answer = ub.session.query(ub.Answer).filter_by(user_id=user_id, question_id=question_id).first()
+                    if existing_answer:
+                        existing_answer.answer = answer # Actualizar la respuesta existente
+                    else:
+                        # Crear una nueva respuesta
+                        new_answer = ub.Answer(user_id=user_id, question_id=question_id, answer=answer)
+                        answers.append(new_answer)
+                    
+            # Guardar las respuestas en la base de datos
+            if answers:
+                ub.session.bulk_save_objects(answers)
+            ub.session.commit()
+
+        except ValueError:
+            flash("Hubo un error al procesar sus respuestas. Asegúrese de que todas las respuestas son válidas.", category="error")
+        except IntegrityError:
+            ub.session.rollback()
+            flash("Hubo un error de integridad en la base de datos.", category="error")
+        except OperationalError as e:
+            ub.session.rollback()
+            flash(f"Error operativo de la base de datos: {e}", category="error")
+
+        # Obtener las respuestas guardadas del usuario
+        user_answers = ub.session.query(ub.Answer).filter_by(user_id=user_id).all()
+        
+        # Calcular las probabilidades y determinar el género recomendado
+        questions_so_far = [ans.question_id for ans in user_answers]
+        answers_so_far = [ans.answer for ans in user_answers]
+        probabilities = calculate_probabilities(questions_so_far, answers_so_far)
+        result_name = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name']
+        recommended_books_names = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name'].split(', ')
+        
+        result = []
+        for book_name in recommended_books_names:
+            print(f"DEBUG: Obteniendo información del libro: {book_name}")  # DEBUG
+            book_info = get_book_info(title=book_name)
+            if book_info:
+                result.append({
+                    'title': book_info['title'],
+                    'author': book_info['author'],
+                    'isbn': book_info['isbn'],
+                    'description': book_info['description'],
+                    'publishedDate': book_info['publication_info'],
+                    'pageCount': book_info['page_count'],
+                    'language': book_info['language'],
+                    'thumbnail': book_info['thumbnail']
+                })
+        
+        # Guardar recomendación
+        existing_recommendation = ub.session.query(ub.Recommendation).filter_by(user_id=user_id).first()
+        if existing_recommendation:
+            existing_recommendation.result = result
+        else:
+            new_recommendation = ub.Recommendation(user_id=user_id, result=result)
+            ub.session.add(new_recommendation)
+            
         ub.session.commit()
 
-    except ValueError:
-        flash("Hubo un error al procesar sus respuestas. Asegúrese de que todas las respuestas son válidas.", category="error")
-    except IntegrityError:
-        ub.session.rollback()
-        flash("Hubo un error de integridad en la base de datos.", category="error")
-    except OperationalError as e:
-        ub.session.rollback()
-        flash(f"Error operativo de la base de datos: {e}", category="error")
-
-    # Obtener las respuestas guardadas del usuario
-    user_answers = ub.session.query(ub.Answer).filter_by(user_id=user_id).all()
-    
-    # Calcular las probabilidades y determinar el género recomendado
-    questions_so_far = [ans.question_id for ans in user_answers]
-    answers_so_far = [ans.answer for ans in user_answers]
-    probabilities = calculate_probabilities(questions_so_far, answers_so_far)
-    result_name = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name']
-    recommended_books_names = sorted(probabilities, key=lambda p: p['probability'], reverse=True)[0]['name'].split(', ')
-    
-    result = []
-    for book_name in recommended_books_names:
-        print(f"DEBUG: Obteniendo información del libro: {book_name}")  # DEBUG
-        book_info = get_book_info(title=book_name)
-        if book_info:
-            result.append({
-                'title': book_info['title'],
-                'author': book_info['author'],
-                'isbn': book_info['isbn'],
-                'description': book_info['description'],
-                'publishedDate': book_info['publication_info'],
-                'pageCount': book_info['page_count'],
-                'language': book_info['language'],
-                'thumbnail': book_info['thumbnail']
-            })
-    
-    '''# Guardar recomendación
-    existing_recommendation = ub.session.query(ub.Recommendation).filter_by(user_id=user_id).first()
-    if existing_recommendation:
-        #existing_recommendation.result = recommended_books_names
-        existing_recommendation.result = result
     else:
-        new_recommendation = ub.Recommendation(user_id=user_id, result=result)
-        ub.session.add(new_recommendation)
-        
-    ub.session.commit()
-    print(f"Book Recommendations: {result}") # DEBUG
-    # Guardar recomendación'''
-    
+        # Si es GET, cargar la recomendación existente
+        existing_recommendation = ub.session.query(ub.Recommendation).filter_by(user_id=user_id).first()
+        if existing_recommendation:
+            result = existing_recommendation.result
+        else:
+            flash("No hay recomendaciones disponibles.", category="error")
+            return redirect(url_for('recomendador'))
+
     return render_title_template(
         'detail_recomendador.html',
         result=result,
         title="Recomendador")
+
     
 #################################### NUEVO recomendador ####################################
 
