@@ -5,26 +5,47 @@
 {% block body %}
 <div class="container mt-5">
     <h2>Agregar Foro</h2>
+
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <form method="post" action="{{ url_for('add_forum') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
         <div class="form-group">
             <label for="name">Nombre:</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="name" 
+                name="name" 
+                required 
+                value="{{ error_name or request.form.name if request.form else '' }}">
         </div>
+        
         <div class="form-group">
             <label for="description">Descripción:</label>
-            <textarea class="form-control" id="description" name="description"></textarea>
+            <textarea class="form-control" id="description" name="description">{{ request.form.description if request.form else '' }}</textarea>
         </div>
+        
         <div class="form-group">
             <label for="category_id">Categoría:</label>
             <select class="form-control" id="category_id" name="category_id" required>
                 {% for category in categories %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
+                <option value="{{ category.id }}" {% if request.form.category_id == category.id|string %}selected{% endif %}>{{ category.name }}</option>
                 {% endfor %}
             </select>
         </div>
+        
         <button type="submit" class="btn btn-primary" style="background-color: #45b29d; border-color: #45b29d;">Agregar Foro</button>
     </form>
+    
     <a href="{{ url_for('manage_forums') }}" class="btn btn-secondary mt-3">Volver a Foros</a>
 </div>
 {% endblock %}

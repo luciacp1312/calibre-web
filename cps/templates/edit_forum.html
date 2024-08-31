@@ -5,6 +5,20 @@
 {% block body %}
 <div class="container mt-5">
     <h2>Editar Foro</h2>
+
+    <!-- Mostrar mensajes de flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <form method="post" action="{{ url_for('edit_forum', forum_id=forum.id) }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
@@ -23,7 +37,7 @@
                 {% endfor %}
             </select>
         </div>
-        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="submit" class="btn btn-primary" style="background-color: #45b29d; border-color: #45b29d;">Guardar Cambios</button>
     </form>
     <a href="{{ url_for('manage_forums') }}" class="btn btn-secondary mt-3">Volver a Foros</a>
 </div>

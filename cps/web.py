@@ -1598,7 +1598,7 @@ def manage_categories():
         title="Borrar Categorías",
         page='forum'
     )
-    
+
 @app.route('/categories/add', methods=['GET', 'POST'])
 @login_required
 def add_category():
@@ -1608,7 +1608,18 @@ def add_category():
 
         if not name:
             flash('¡Nombre requerido!', 'danger')
-            return redirect(url_for('add_category'))
+            return render_title_template('add_category.html', title="Categories", page='forum', error_name=name)
+
+        # Verificar si la categoría ya existe
+        existing_category = ub.session.query(ub.ForumCategory).filter_by(name=name).first()
+        if existing_category:
+            flash('Ya existe una categoría con ese nombre. Por favor, elige un nombre diferente.', 'danger')
+            return render_title_template(
+                'add_category.html',
+                title="Categories",
+                page='forum',
+                error_name=name  # Pasar el nombre para mostrar en el campo con el error
+            )
 
         try:
             category = ub.ForumCategory(name=name, description=description)
@@ -1617,7 +1628,7 @@ def add_category():
             flash('¡Categoría agregada con éxito!', 'success')
         except Exception as e:
             flash('Ha ocurrido un error al agregar la categoría. Por favor, inténtelo de nuevo.', 'danger')
-            return redirect(url_for('add_category'))
+            return render_title_template('add_category.html', title="Categories", page='forum')
         
         return redirect(url_for('manage_forums'))  # Redirigir a /forums después de agregar la categoría
 
@@ -1644,18 +1655,46 @@ def add_forum():
         description = request.form.get('description', '')
         category_id = request.form.get('category_id')
         category_id = int(category_id)
-        forum = ub.Forum(name=name, description=description, category_id=category_id)
-        ub.session.add(forum)
-        ub.session.commit()
-        flash('¡Foro agregado con éxito!', 'success')
+
+        # Verificar si el nombre del foro ya existe
+        existing_forum = ub.session.query(ub.Forum).filter_by(name=name).first()
+        if existing_forum:
+            flash('Ya existe un foro con ese nombre. Por favor, elige un nombre diferente.', 'danger')
+            categories = ub.session.query(ub.ForumCategory).all()
+            return render_title_template(
+                'add_forum.html',
+                categories=categories,
+                title="Forum",
+                page='forum',
+                error_name=name  # Pasar el nombre para mostrar en el campo con el error
+            )
+
+        # Crear el nuevo foro si el nombre es único
+        try:
+            forum = ub.Forum(name=name, description=description, category_id=category_id)
+            ub.session.add(forum)
+            ub.session.commit()
+            flash('¡Foro agregado con éxito!', 'success')
+        except Exception as e:
+            flash('Ha ocurrido un error al agregar el foro. Por favor, inténtelo de nuevo.', 'danger')
+            categories = ub.session.query(ub.ForumCategory).all()
+            return render_title_template(
+                'add_forum.html',
+                categories=categories,
+                title="Forum",
+                page='forum',
+                error_name=name  # Para mantener el valor en caso de error
+            )
         return redirect(url_for('manage_forums'))
+
     categories = ub.session.query(ub.ForumCategory).all()
     return render_title_template(
         'add_forum.html',
         categories=categories,
         title="Forum",
-        page = 'forum'
+        page='forum'
     )
+
 
 @app.route('/forums/edit/<int:forum_id>', methods=['GET', 'POST'])
 @login_required
@@ -1666,11 +1705,30 @@ def edit_forum(forum_id):
         return redirect(url_for('manage_forums'))
     
     if request.method == 'POST':
-        forum.name = request.form.get('name')
-        forum.description = request.form.get('description', '')
-        forum.category_id = int(request.form.get('category_id'))
+        new_name = request.form.get('name')
+        new_description = request.form.get('description', '')
+        new_category_id = int(request.form.get('category_id'))
+        
+        # Verificar si el nuevo nombre ya existe
+        existing_forum = ub.session.query(ub.Forum).filter_by(name=new_name).first()
+        
+        if existing_forum and existing_forum.id != forum_id:
+            flash('Ya existe un foro con ese nombre. Elija otro nombre.', 'danger')
+            # Pasar los datos actuales del foro al formulario para que el usuario no pierda la información
+            return render_template(
+                'edit_forum.html',
+                forum=forum,
+                categories=ub.session.query(ub.ForumCategory).all(),
+                title="Edit Forum",
+                page='forum'
+            )
         
         try:
+            # Actualizar los detalles del foro
+            forum.name = new_name
+            forum.description = new_description
+            forum.category_id = new_category_id
+            
             ub.session.commit()
             flash('¡Foro actualizado con éxito!', 'success')
             return redirect(url_for('manage_forums'))
@@ -1679,7 +1737,7 @@ def edit_forum(forum_id):
             flash('Ha ocurrido un error al actualizar el foro. Por favor, inténtelo de nuevo.', 'danger')
     
     categories = ub.session.query(ub.ForumCategory).all()
-    return render_title_template(
+    return render_template(
         'edit_forum.html',
         forum=forum,
         categories=categories,

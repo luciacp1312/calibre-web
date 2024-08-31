@@ -5,15 +5,25 @@
 {% block body %}
 <div class="container mt-5">
     <h2>Agregar Categoría</h2>
+
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <form method="post" action="{{ url_for('add_category') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="name">Nombre:</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+            <input type="text" class="form-control" id="name" name="name" value="{{ request.form.name if request.form else '' }}" required>
         </div>
         <div class="form-group">
             <label for="description">Descripción:</label>
-            <textarea class="form-control" id="description" name="description"></textarea>
+            <textarea class="form-control" id="description" name="description">{{ request.form.description if request.form else '' }}</textarea>
         </div>
         <button type="submit" class="btn btn-primary" style="background-color: #45b29d; border-color: #45b29d;">Agregar Categoría</button>
     </form>
