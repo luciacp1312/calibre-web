@@ -713,3 +713,154 @@ class TestDefaultSuite():
         )
         error_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-danger").text
         assert error_message == "No hay notificaciones para eliminar."
+        
+        
+        
+  ############################## TESTS AUDIOLIBRO ##############################
+  
+  def wait_for_window(self, timeout = 2):
+    time.sleep(round(timeout / 1000))
+    wh_now = self.driver.window_handles
+    wh_then = self.vars["window_handles"]
+    if len(wh_now) > len(wh_then):
+      return set(wh_now).difference(set(wh_then)).pop()
+  
+  def test_escuchar_y_parar_libro(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    
+    # Buscar libro "El gran Gatsby"
+    self.driver.find_element(By.XPATH, "//img[@alt=\'El gran Gatsby\']").click()
+    element = self.driver.find_element(By.XPATH, "//img[@alt=\'El gran Gatsby\']")
+    
+    # Mover el cursor al libro "El gran Gatsby"
+    actions = ActionChains(self.driver)
+    actions.move_to_element(element).perform()
+    
+    # Mover el cursor al cuerpo de la página
+    element = self.driver.find_element(By.CSS_SELECTOR, "body")
+    actions = ActionChains(self.driver)
+    actions.move_to_element(element).move_by_offset(0, 0).perform()
+    time.sleep(1)
+    self.vars["window_handles"] = self.driver.window_handles
+    
+    # Abrir nueva ventana para el lector digital
+    self.driver.find_element(By.ID, "readbtn").click()
+    self.vars["win5834"] = self.wait_for_window(2000)
+    self.driver.switch_to.window(self.vars["win5834"])
+    self.driver.find_element(By.ID, "next").click()
+    
+    # Escuchar y parar audio
+    self.driver.find_element(By.ID, "play-button").click()
+    time.sleep(2)
+    self.driver.find_element(By.ID, "pause-button").click()
+    time.sleep(1)
+  
+  
+  def test_avanzar_audio(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    
+    # Buscar libro "El gran Gatsby"
+    self.driver.find_element(By.XPATH, "//img[@alt=\'El gran Gatsby\']").click()
+    element = self.driver.find_element(By.XPATH, "//img[@alt=\'El gran Gatsby\']")
+    
+    # Mover el cursor al libro "El gran Gatsby"
+    actions = ActionChains(self.driver)
+    actions.move_to_element(element).perform()
+    
+    # Mover el cursor al cuerpo de la página
+    element = self.driver.find_element(By.CSS_SELECTOR, "body")
+    actions = ActionChains(self.driver)
+    actions.move_to_element(element).move_by_offset(0, 0).perform()
+    time.sleep(1)
+    self.vars["window_handles"] = self.driver.window_handles
+    
+    # Abrir nueva ventana para el lector digital
+    self.driver.find_element(By.ID, "readbtn").click()
+    self.vars["win5834"] = self.wait_for_window(2000)
+    self.driver.switch_to.window(self.vars["win5834"])
+    self.driver.find_element(By.ID, "next").click()
+    
+    # Reproducir audio
+    self.driver.find_element(By.ID, "play-button").click()
+    # Avanzar el progreso en la barra
+    self.driver.find_element(By.ID, "progress-bar").send_keys("17")
+    self.driver.find_element(By.ID, "progress-bar").click()
+    # Continuar reproduciendo tras avanzar el progreso
+    self.driver.find_element(By.ID, "play-button").click()
+    time.sleep(1)
+  
+  
+  def test_cambiar_capitulo(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    
+    # Buscar libro "El gran Gatsby"
+    self.driver.find_element(By.XPATH, "//img[@alt=\'El gran Gatsby\']").click()
+    element = self.driver.find_element(By.XPATH, "//img[@alt=\'El gran Gatsby\']")
+    
+    # Mover el cursor al libro "El gran Gatsby"
+    actions = ActionChains(self.driver)
+    actions.move_to_element(element).perform()
+    
+    # Mover el cursor al cuerpo de la página
+    element = self.driver.find_element(By.CSS_SELECTOR, "body")
+    actions = ActionChains(self.driver)
+    actions.move_to_element(element).move_by_offset(0, 0).perform()
+    time.sleep(1)
+    self.vars["window_handles"] = self.driver.window_handles
+    
+    # Abrir nueva ventana para el lector digital
+    self.driver.find_element(By.ID, "readbtn").click()
+    self.vars["win684"] = self.wait_for_window(2000)
+    self.driver.switch_to.window(self.vars["win684"])
+    self.driver.find_element(By.ID, "next").click()
+    
+    # Obtener duración total del primer capítulo
+    self.driver.find_element(By.ID, "play-button").click()
+    time.sleep(1)
+    total_time_chapter_1 = self.driver.find_element(By.ID, "total-time").text
+    self.driver.find_element(By.ID, "pause-button").click()
+    
+    # Avanzar al siguiente capítulo
+    self.driver.find_element(By.ID, "next").click()
+    self.driver.find_element(By.ID, "next").click()
+    self.driver.find_element(By.ID, "next").click()
+    self.driver.find_element(By.ID, "next").click()
+    self.driver.find_element(By.ID, "next").click()
+    self.driver.find_element(By.ID, "next").click()
+    
+    # Obtener duración total del siguiente capítulo
+    self.driver.find_element(By.ID, "play-button").click()
+    time.sleep(1)
+    total_time_chapter_2 = self.driver.find_element(By.ID, "total-time").text
+    time.sleep(1)
+    self.driver.find_element(By.ID, "pause-button").click()
+    # Comparar los tiempos totales y hacer el assert
+    assert total_time_chapter_1 != total_time_chapter_2, "El tiempo total no se ha recalculado al cambiar de capítulo."
+    time.sleep(1)
