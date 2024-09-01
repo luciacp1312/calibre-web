@@ -1969,10 +1969,18 @@ def notifications():
 @app.route('/notifications/delete_all', methods=['POST'])
 @login_required
 def delete_all_notifications():
-    ub.session.query(ub.Notification).filter(ub.Notification.user_id == current_user.id).delete()
-    ub.session.commit()
-    flash('Todas las notificaciones han sido eliminadas.', 'success')
+    notifications = ub.session.query(ub.Notification).filter(ub.Notification.user_id == current_user.id).all()
+    
+    # Comprobar si hay notificaciones para eliminar
+    if not notifications:
+        flash('No hay notificaciones para eliminar.', 'danger')
+    else:
+        ub.session.query(ub.Notification).filter(ub.Notification.user_id == current_user.id).delete()
+        ub.session.commit()
+        flash('Todas las notificaciones han sido eliminadas.', 'success')
+
     return redirect(url_for('notifications'))
+
 
 
 @app.route('/notifications/delete/<int:notification_id>', methods=['POST'])

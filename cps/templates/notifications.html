@@ -6,7 +6,22 @@
         <div class="col-md-8 offset-md-2">
             <h2 class="text-center mb-4">Notificaciones</h2>
             <hr class="mb-4">
-
+            
+            <!-- Mostrar mensajes de flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="alert-container">
+                        {% for category, message in messages %}
+                            {% if category == 'danger' %}
+                                <div class="alert alert-{{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
             <!-- Botón para eliminar las notificaciones -->
             <div class="text-right mb-4">
                 <form action="{{ url_for('delete_all_notifications') }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar todas las notificaciones?');" style="display: inline;">

@@ -26,6 +26,8 @@ class TestDefaultSuite():
   def teardown_method(self, method):
     self.driver.quit()
   
+  ############################## TESTS LOGIN ##############################
+  
   def test_login(self):
     self.driver.get("http://localhost:8083/login?next=%2F")
     self.driver.set_window_size(974, 1040)
@@ -34,6 +36,9 @@ class TestDefaultSuite():
     self.driver.find_element(By.ID, "password").click()
     self.driver.find_element(By.ID, "password").send_keys("admin123")
     self.driver.find_element(By.NAME, "submit").click()
+  
+  
+  ############################## TESTS RECOMENDADOR ##############################
   
   def test_recomendador(self):
     # Se debe iniciar sesión primero
@@ -51,7 +56,7 @@ class TestDefaultSuite():
     # Comprueba si aparece el botón "Volver a realizar el test"
     try:
         volver_boton = self.driver.find_element(By.LINK_TEXT, "Volver a realizar el test")
-        volver_boton.click()  # Hacemos clic para reiniciar el test
+        volver_boton.click()
     except:
         pass  # Si el botón no está presente, continua con el proceso normal
 
@@ -66,11 +71,15 @@ class TestDefaultSuite():
     self.driver.find_element(By.NAME, "question_8").click()
     self.driver.find_element(By.NAME, "question_9").click()
     self.driver.find_element(By.NAME, "question_10").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()  
+  
+  
+  ############################## TESTS FORO ##############################
   
   def generate_unique_suffix(self):
-    """Genera un sufijo único aleatorio."""
+    #Genera un sufijo único aleatorio.
     return ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+  
   
   def test_agregarforo(self):
     # Se debe iniciar sesión primero
@@ -186,6 +195,10 @@ class TestDefaultSuite():
     success_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-success")
     assert "¡Foro actualizado con éxito!" in success_message.text
         
+      
+      
+  ############################## TESTS FORO CATEGORÍA ##############################
+  
   def test_agregarcategoria(self):
     # Se debe iniciar sesión primero
     self.driver.get("http://localhost:8083/login?next=%2F")
@@ -264,6 +277,9 @@ class TestDefaultSuite():
         pytest.fail(f"Test falló con excepción: {e}")
         
         
+        
+  ############################## TESTS FORO HILO ##############################
+  
   def test_agregarhilo(self):
     # Se debe iniciar sesión primero
     self.driver.get("http://localhost:8083/login?next=%2F")
@@ -342,6 +358,9 @@ class TestDefaultSuite():
         pytest.fail(f"Test falló con excepción: {e}")
 
         
+        
+  ############################## TESTS FORO COMENTARIO ##############################
+  
   def test_agregarcomentario(self):
     # Se debe iniciar sesión primero
     self.driver.get("http://localhost:8083/login?next=%2F")
@@ -435,3 +454,262 @@ class TestDefaultSuite():
         
     except Exception as e:
         pytest.fail(f"Test falló con excepción: {e}")
+        
+        
+        
+  ############################## TESTS RED SOCIAL SEGUIDOS Y SEGUIDORES ##############################
+
+  def test_buscarusuario(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, "#top_user > .glyphicon").click()
+    self.driver.find_element(By.LINK_TEXT, "Buscar usuarios").click()
+    self.driver.find_element(By.NAME, "q").click()
+    self.driver.find_element(By.NAME, "q").send_keys("lucia")
+    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
+    self.driver.find_element(By.LINK_TEXT, "lucia").click()
+  
+  def test_dejardeseguir(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, "#top_user > .glyphicon").click()
+    self.driver.find_element(By.LINK_TEXT, "Ir al perfil").click()
+    self.driver.find_element(By.LINK_TEXT, "Seguidos").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".mb-4:nth-child(2) .btn").click()
+  
+  def test_seguir(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "top_user").click()
+    self.driver.find_element(By.LINK_TEXT, "Buscar usuarios").click()
+    self.driver.find_element(By.NAME, "q").click()
+    self.driver.find_element(By.NAME, "q").send_keys("lucia")
+    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".btn-secondary:nth-child(2)").click()
+  
+  def test_verseguidores(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, "#top_user > .glyphicon").click()
+    self.driver.find_element(By.LINK_TEXT, "Ir al perfil").click()
+    self.driver.find_element(By.LINK_TEXT, "Seguidores").click()
+  
+  def test_verseguidos(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, "#top_user > .glyphicon").click()
+    self.driver.find_element(By.LINK_TEXT, "Ir al perfil").click()
+    self.driver.find_element(By.LINK_TEXT, "Seguidos").click()
+    
+  
+  
+  ############################## TESTS RED SOCIAL MENSAJES ##############################
+  
+  def test_mandarmensaje(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, "#top_user > .glyphicon").click()
+    self.driver.find_element(By.LINK_TEXT, "Ir al perfil").click()
+    self.driver.find_element(By.LINK_TEXT, "Seguidos").click()
+    self.driver.find_element(By.LINK_TEXT, "lucia").click()
+    self.driver.find_element(By.LINK_TEXT, "Abrir Chat").click()
+    
+    self.driver.find_element(By.NAME, "content").click()
+    self.driver.find_element(By.NAME, "content").send_keys("hola")
+    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
+  
+  
+  def test_mandar_y_borrar_mensaje(self):
+    # Se debe iniciar sesión primero
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    # Navegar al perfil y abrir el chat
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, "#top_user > .glyphicon").click()
+    self.driver.find_element(By.LINK_TEXT, "Ir al perfil").click()
+    self.driver.find_element(By.LINK_TEXT, "Seguidos").click()
+    self.driver.find_element(By.LINK_TEXT, "lucia").click()
+    self.driver.find_element(By.LINK_TEXT, "Abrir Chat").click()
+    
+    # Enviar un mensaje
+    self.driver.find_element(By.NAME, "content").click()
+    self.driver.find_element(By.NAME, "content").send_keys("hola")
+    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
+    
+    # Esperar y verificar que el mensaje se envió correctamente
+    WebDriverWait(self.driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, ".message"))
+    )
+    
+    messages = self.driver.find_elements(By.CSS_SELECTOR, ".message")
+    assert len(messages) > 0, "No se encontraron mensajes en el chat."
+
+    # Buscar el botón de borrar en el mensaje más reciente
+    last_message = messages[-1]
+    delete_button = last_message.find_element(By.CSS_SELECTOR, ".delete-button")
+    delete_button.click()
+    
+    try:
+      # Esperar a que el mensaje de éxito aparezca
+      WebDriverWait(self.driver, 10).until(
+          EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-success"))
+      )
+      success_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-success")
+      assert "Mensaje eliminado." in success_message.text
+      
+    except Exception as e:
+      pytest.fail(f"Test falló con excepción: {e}")  
+
+  
+  
+  ############################## TESTS RED SOCIAL NOTIFICACIONES ##############################
+  
+  def test_notificacion_ver_mensaje(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, ".glyphicon-bell").click()
+    self.driver.find_element(By.LINK_TEXT, "Ver mensaje").click()
+  
+  def test_notificacion_ver_perfil(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, ".glyphicon-bell").click()
+    self.driver.find_element(By.LINK_TEXT, "Ver perfil").click()
+  
+  def test_notificacion_ver_post(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, ".glyphicon-bell").click()
+    self.driver.find_element(By.LINK_TEXT, "Ver post").click()
+  
+  def test_borrar_una_notificacion(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, ".glyphicon-bell").click()
+    
+    notifications = self.driver.find_elements(By.CSS_SELECTOR, ".list-group-item")
+    if len(notifications) == 0:
+      pytest.skip("No quedan notificaciones para borrar.")
+    
+    self.driver.find_element(By.CSS_SELECTOR, ".list-group-item:nth-child(1) > form > .btn").click()
+  
+  def test_borrar_notificaciones(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.CSS_SELECTOR, ".glyphicon-bell").click()
+
+    # Comprobar si hay notificaciones para eliminar
+    notifications_present = len(self.driver.find_elements(By.CSS_SELECTOR, ".list-group-item")) > 0
+    # Eliminar todas las notificaciones
+    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
+    assert self.driver.switch_to.alert.text == "¿Estás seguro de que quieres eliminar todas las notificaciones?"
+    self.driver.switch_to.alert.accept()
+
+    if notifications_present:
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-success"))
+        )
+        success_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-success").text
+        assert success_message == "Todas las notificaciones han sido eliminadas."
+    else:
+        # Esperar a que el mensaje de error aparezca
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-danger"))
+        )
+        error_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-danger").text
+        assert error_message == "No hay notificaciones para eliminar."
