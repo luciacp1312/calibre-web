@@ -1392,7 +1392,7 @@ def get_book_info(isbn=None, title=None):
     elif title:
         params['q'] = f'intitle:{title}'
     else:
-        raise ValueError("Either ISBN or title must be provided.")
+        raise ValueError("El ISBN o el título deben ser proporcionados.")
 
     params['key'] = 'AIzaSyACIkFe67iKjQSMS01E3BPiftD9AAs8QAU'
     
@@ -1496,7 +1496,7 @@ def delete_thread(thread_id):
         # Eliminar el thread
         ub.session.delete(thread)
         ub.session.commit()
-        flash('El hilo y sus comentarios han sido eliminados con éxito!', 'success')
+        flash('¡El hilo y sus comentarios han sido eliminados con éxito!', 'success')
     except Exception as e:
         ub.session.rollback()
         flash('Ha ocurrido un error al borrar el hilo. Por favor, inténtelo de nuevo.', 'danger')

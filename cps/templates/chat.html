@@ -38,7 +38,8 @@
         background-color: #dc3545;
         color: white;
         border: none;
-        padding: 5px 10px;
+        padding: 2px 5px;
+        line-height: 1.2;
         cursor: pointer;
     }
 </style>
@@ -61,7 +62,7 @@
                         <!-- Formulario para eliminar el mensaje -->
                         <form method="post" action="{{ url_for('delete_message', message_id=message.id) }}" style="display: inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="delete-button btn btn-sm">Eliminar</button>
+                            <button type="submit" class="delete-button btn btn-sm">X</button>
                         </form>
                     {% endif %}
                 </div>
