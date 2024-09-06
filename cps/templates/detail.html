@@ -16,7 +16,7 @@
                         {% if entry.data|length %}
                             <div class="btn-group" role="group">
                                 {% if entry.data|length < 2 %}
-                                    <button id="Download" type="button" class="btn btn-primary">
+                                    <!--<button id="Download" type="button" class="btn btn-primary">
                                         {{ _('Download') }} :
                                     </button>
                                     {% for format in entry.data %}
@@ -26,7 +26,7 @@
                                             <span class="glyphicon glyphicon-download"></span>{{ format.format }}
                                             ({{ format.uncompressed_size|filesizeformat }})
                                         </a>
-                                    {% endfor %}
+                                    {% endfor %}-->
                                 {% else %}
                                     <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

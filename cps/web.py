@@ -37,7 +37,6 @@ from sqlalchemy.sql.expression import text, func, false, not_, and_, or_
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.sql.functions import coalesce
 
-############################### NUEVO ###############################
 from flask import flash, redirect, url_for, request
 import os
 from . import web
@@ -45,7 +44,6 @@ from flask import jsonify
 from .recomendador import *
 from cps.db import Answer
 from cps.ub import ForumCategory, Forum, Thread, Post
-############################### NUEVO ###############################
 
 from werkzeug.datastructures import Headers
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -104,7 +102,7 @@ def add_security_headers(resp):
     if request.endpoint == "web.read_book":
         csp += " blob:"
     #csp += "; img-src 'self'"
-    # NUEVO permitir imágenes del recomendador
+    # Permitir imágenes del recomendador
     csp += "; img-src 'self' http://books.google.com https://books.google.com"
     if request.path.startswith("/author/") and config.config_use_goodreads:
         csp += " images.gr-assets.com i.gr-assets.com s.gr-assets.com"
@@ -1255,7 +1253,7 @@ def download_link(book_id, book_format, anyname):
     client = "kobo" if "Kobo" in request.headers.get('User-Agent') else ""
     return get_download_link(book_id, book_format, client)
 
-#################################### NUEVO recomendador ####################################
+#################################### RECOMENDADOR ####################################
 def render_recomendador(page, book_id=None, order=['default', 'order'], result=None):
     if order is None:
         order = ['default', 'order']
@@ -1377,10 +1375,8 @@ def recomendaciones():
         result=result,
         title="Recomendador")
 
-    
-#################################### NUEVO recomendador ####################################
 
-#################################### NUEVO buscar libro recomendador  ####################################
+# Buscar libro recomendador
 import requests
 
 def get_book_info(isbn=None, title=None):
@@ -1434,9 +1430,9 @@ def get_book_info(isbn=None, title=None):
 
     return book_info
 
-#################################### NUEVO buscar libro recomendador ####################################
+#################################### RECOMENDADOR ####################################
 
-################################ NUEVO foro ################################
+################################ FORO ################################
 
 # Ruta para eliminar un foro
 @app.route('/forums/delete/<int:forum_id>', methods=['POST'])
@@ -1461,10 +1457,8 @@ def delete_forum(forum_id):
             for post in posts:
                 ub.session.delete(post)
             
-            # Eliminar el hilo
             ub.session.delete(thread)
             
-        # Eliminar el foro
         ub.session.delete(forum)
         ub.session.commit()
         flash('¡Foro eliminado con éxito!', 'success')
@@ -1493,7 +1487,6 @@ def delete_thread(thread_id):
         for post in posts:
             ub.session.delete(post)
         
-        # Eliminar el thread
         ub.session.delete(thread)
         ub.session.commit()
         flash('¡El hilo y sus comentarios han sido eliminados con éxito!', 'success')
@@ -1559,10 +1552,8 @@ def delete_category(category_id):
     # Obtener o crear la categoría por defecto
     default_category = ub.session.query(ub.ForumCategory).filter_by(name='Sin Categoría').first()
     if not default_category:
-        # Llamar al método para crear la categoría por defecto
         try:
             create_default_category()
-            # Volver a buscar la categoría por defecto después de la creación
             default_category = ub.session.query(ub.ForumCategory).filter_by(name='Sin Categoría').first()
         except Exception as e:
             flash('Ha ocurrido un error al crear la categoría por defecto. Por favor, inténtelo de nuevo.', 'danger')
@@ -1572,7 +1563,6 @@ def delete_category(category_id):
         # Actualizar los foros que usan esta categoría
         affected_forums = ub.session.query(ub.Forum).filter_by(category_id=category_id).update({'category_id': default_category.id})
         
-        # Eliminar la categoría
         ub.session.delete(category)
         ub.session.commit()
         
@@ -1587,7 +1577,6 @@ def delete_category(category_id):
     return redirect(url_for('manage_categories'))
 
 
-# Gestión de categorías
 @app.route('/categories')
 @login_required
 def manage_categories():
@@ -1610,7 +1599,6 @@ def add_category():
             flash('¡Nombre requerido!', 'danger')
             return render_title_template('add_category.html', title="Categories", page='forum', error_name=name)
 
-        # Verificar si la categoría ya existe
         existing_category = ub.session.query(ub.ForumCategory).filter_by(name=name).first()
         if existing_category:
             flash('Ya existe una categoría con ese nombre. Por favor, elige un nombre diferente.', 'danger')
@@ -1618,7 +1606,7 @@ def add_category():
                 'add_category.html',
                 title="Categories",
                 page='forum',
-                error_name=name  # Pasar el nombre para mostrar en el campo con el error
+                error_name=name
             )
 
         try:
@@ -1630,12 +1618,11 @@ def add_category():
             flash('Ha ocurrido un error al agregar la categoría. Por favor, inténtelo de nuevo.', 'danger')
             return render_title_template('add_category.html', title="Categories", page='forum')
         
-        return redirect(url_for('manage_forums'))  # Redirigir a /forums después de agregar la categoría
+        return redirect(url_for('manage_forums'))
 
     return render_title_template('add_category.html', title="Categories", page='forum')
 
 
-# Gestión de foros
 @app.route('/forums')
 @login_required
 def manage_forums():
@@ -1656,7 +1643,6 @@ def add_forum():
         category_id = request.form.get('category_id')
         category_id = int(category_id)
 
-        # Verificar si el nombre del foro ya existe
         existing_forum = ub.session.query(ub.Forum).filter_by(name=name).first()
         if existing_forum:
             flash('Ya existe un foro con ese nombre. Por favor, elige un nombre diferente.', 'danger')
@@ -1666,10 +1652,9 @@ def add_forum():
                 categories=categories,
                 title="Forum",
                 page='forum',
-                error_name=name  # Pasar el nombre para mostrar en el campo con el error
+                error_name=name
             )
 
-        # Crear el nuevo foro si el nombre es único
         try:
             forum = ub.Forum(name=name, description=description, category_id=category_id)
             ub.session.add(forum)
@@ -1683,7 +1668,7 @@ def add_forum():
                 categories=categories,
                 title="Forum",
                 page='forum',
-                error_name=name  # Para mantener el valor en caso de error
+                error_name=name
             )
         return redirect(url_for('manage_forums'))
 
@@ -1714,7 +1699,6 @@ def edit_forum(forum_id):
         
         if existing_forum and existing_forum.id != forum_id:
             flash('Ya existe un foro con ese nombre. Elija otro nombre.', 'danger')
-            # Pasar los datos actuales del foro al formulario para que el usuario no pierda la información
             return render_template(
                 'edit_forum.html',
                 forum=forum,
@@ -1724,7 +1708,6 @@ def edit_forum(forum_id):
             )
         
         try:
-            # Actualizar los detalles del foro
             forum.name = new_name
             forum.description = new_description
             forum.category_id = new_category_id
@@ -1759,13 +1742,11 @@ def view_forum(forum_id):
         'view_forum.html',
         forum=forum,
         threads=threads,
-        #forum_id=forum_id,
         title=forum.name,
         page='forum'
     )
 
 
-# Gestión de Hilos
 @app.route('/threads')
 @login_required
 def manage_threads():
@@ -1777,11 +1758,9 @@ def manage_threads():
         page='forum'
     )
     
-#@app.route('/threads/add', methods=['GET', 'POST'])
 @app.route('/forums/<int:forum_id>/threads/add', methods=['GET', 'POST'])
 @login_required
 def add_thread(forum_id):
-    #forum_id = request.args.get('forum_id', None)
     forum = ub.session.query(ub.Forum).get(forum_id)
     if not forum:
         flash('¡Foro no encontrado!', 'danger')
@@ -1831,7 +1810,6 @@ def view_thread(thread_id):
         page='forum'
     )
 
-# Gestión de Publicaciones
 @app.route('/posts', defaults={'thread_id': None})
 @app.route('/posts/<int:thread_id>')
 @login_required
@@ -1887,13 +1865,12 @@ def add_post(thread_id):
         page='forum'
     )
 
-################################ NUEVO foro ################################
+################################ FORO ################################
 
-################################ NUEVO red social ################################
+################################ RED SOCIAL ################################
 @app.route('/chat/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def chat(user_id):
-    # Obtener el usuario con el que se quiere chatear
     other_user = ub.session.query(ub.User).get(user_id)
     if not other_user or other_user.id == current_user.id:
         flash('Usuario no encontrado o no puedes chatear contigo mismo.', 'danger')
@@ -1925,10 +1902,8 @@ def chat(user_id):
 @app.route('/delete_message/<int:message_id>', methods=['POST'])
 @login_required
 def delete_message(message_id):
-    # Obtener el mensaje a eliminar
     message = ub.session.query(ub.Message).get(message_id)
     
-    # Verificar que el mensaje existe y que el usuario actual es el remitente
     if message and message.sender_id == current_user.id:
         ub.session.delete(message)
         ub.session.commit()
@@ -1936,7 +1911,6 @@ def delete_message(message_id):
     else:
         flash('No tienes permiso para eliminar este mensaje.', 'danger')
 
-    # Redirigir de vuelta al chat
     return redirect(url_for('chat', user_id=message.receiver_id if message.sender_id == current_user.id else message.sender_id))
 
 
@@ -1945,7 +1919,6 @@ def delete_message(message_id):
 def notifications():
     notifications = ub.session.query(ub.Notification).filter(ub.Notification.user_id == current_user.id).order_by(ub.Notification.timestamp.desc()).all()
     
-    # Procesar los datos de las notificaciones
     processed_notifications = []
     for notification in notifications:
         if 'ha comenzado a seguirte' in notification.message.lower():
@@ -1971,7 +1944,6 @@ def notifications():
 def delete_all_notifications():
     notifications = ub.session.query(ub.Notification).filter(ub.Notification.user_id == current_user.id).all()
     
-    # Comprobar si hay notificaciones para eliminar
     if not notifications:
         flash('No hay notificaciones para eliminar.', 'danger')
     else:
@@ -2051,7 +2023,7 @@ def unfollow(username):
 def following(username):
     user = ub.session.query(ub.User).filter_by(name=username).first()
     if user is None:
-        abort(404)  # Lanzar un error 404 si el usuario no se encuentra
+        abort(404)
     following_ids = [assoc.followed_id for assoc in user.following_associations]
     users = ub.session.query(ub.User).filter(ub.User.id.in_(following_ids)).all()
     return render_title_template('following.html', users=users, title=f"Seguidos por {user.name}", page='following', current_user_name=username)
@@ -2061,7 +2033,7 @@ def following(username):
 def followers(username):
     user = ub.session.query(ub.User).filter_by(name=username).first()
     if user is None:
-        abort(404)  # Lanzar un error 404 si el usuario no se encuentra
+        abort(404)
     follower_ids = [assoc.follower_id for assoc in user.follower_associations]
     users = ub.session.query(ub.User).filter(ub.User.id.in_(follower_ids)).all()
     return render_title_template('followers.html', users=users, title=f"Seguidores de {user.name}", page='followers', current_user_name=username)
@@ -2104,7 +2076,7 @@ def user_profile(username):
         title="Profile",
         page='profile'
     )
-################################ NUEVO red social ################################
+################################ RED SOCIAL ################################
 
 
     

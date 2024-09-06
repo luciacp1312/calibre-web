@@ -54,21 +54,25 @@
                 <div class="row">
                     {% for download in downloads %}
                         {% set book_data = books[download.book_id] %}
-                        {% set book = book_data.book %}
-                        {% set cover_url = book_data.cover_url %}
+                        {% if book_data %}
+                            {% set book = book_data.book %}
+                            {% set cover_url = book_data.cover_url %}
                         
-                        <div class="col-md-3 mb-4">
-                            <div class="text-center">
-                                <img src="{{ cover_url }}" alt="{{ book.title }} cover" class="img-fluid mb-2" style="max-width: 100%; height: auto;">
-                                <div class="font-weight-bold" style="font-size: 1.2em;">
-                                    {{ book.title }}
+                            <div class="col-md-3 mb-4">
+                                <div class="text-center">
+                                    <img src="{{ cover_url }}" alt="{{ book.title }} cover" class="img-fluid mb-2" style="max-width: 100%; height: auto;">
+                                    <div class="font-weight-bold" style="font-size: 1.2em;">
+                                        {{ book.title }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {% if loop.index % 4 == 0 %}
-                            <!-- Opcional: añade un clearfix para asegurar el diseño en la fila -->
-                            <div class="w-100"></div>
+                            {% if loop.index % 4 == 0 %}
+                                <!-- Opcional: añade un clearfix para asegurar el diseño en la fila -->
+                                <div class="w-100"></div>
+                            {% endif %}
+                        {% else %}
+                            <p>Libro no encontrado</p>
                         {% endif %}
                     {% endfor %}
                 </div>

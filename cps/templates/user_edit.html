@@ -2,14 +2,12 @@
 {% block body %}
 <div class="discover">
   <h1>{{title}}</h1>
-  <!-- NUEVO red social -->
   <div class="button-container text-left my-3">
 
     <a href="{{ url_for('search') }}" class="btn btn-primary mx-2" style="background-color: #45b29d; border-color: #45b29d;">Buscar usuarios</a>
-    <!-- NUEVO Botón "Ir al perfil" -->
     <a href="{{ url_for('user_profile', username=current_user.name) }}" class="btn btn-primary mx-2" style="background-color: #45b29d; border-color: #45b29d;">Ir al perfil</a>
   </div>
-  <!-- NUEVO red social -->
+  <!-- Para la red social -->
   <form role="form" method="POST" autocomplete="off">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="col-md-10 col-lg-8">

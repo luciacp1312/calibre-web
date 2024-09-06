@@ -14,8 +14,7 @@
     <link rel="apple-touch-icon" sizes="140x140" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-    <!-- NUEVO importar Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Importar Font Awesome -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/libs/normalize.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
@@ -59,7 +58,7 @@
         <div id="divider"></div>
         <div id="prev" class="arrow">‹</div>
         <div id="viewer"></div>
-        <!-- NUEVO barra progreso audio -->
+        <!-- Barra progreso audio -->
         <div id="progress-container">
             <a id="audio-toggle" class="audio-control">
                 <img id="play-button" src="{{ url_for('static', filename='img/play-button.png') }}" alt="Play" style="width: 150%; height: auto; margin-bottom: 2px; margin-left: 2px;" />
@@ -69,7 +68,7 @@
             <input type="range" id="progress-bar" value="0" min="0" max="100">
             <span id="total-time">00:00</span>
         </div>
-        <!-- NUEVO barra audio -->
+        <!-- Barra audio -->
         <div id="next" class="arrow">›</div>
         <div id="progress">0%</div>
         <div id="loader"><img src="{{ url_for('static', filename='img/loader.gif') }}"></div>

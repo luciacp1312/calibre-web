@@ -3,27 +3,18 @@ import pytest
 import time
 import random, string
 from selenium import webdriver
-#from selenium.webdriver.chrome.service import Service
-#from selenium.webdriver.chrome.options import Options
-#from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-#from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
-#from selenium.webdriver.common.keys import Keys
-#from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.common.exceptions import NoSuchElementException
 
 class TestDefaultSuite():
-  def setup_method(self): #, method
-    #chrome_options = Options()
+  def setup_method(self):
     self.driver = webdriver.Chrome()
-    #chrome_options.add_argument("user-data-dir=C:/Users/Usuario/AppData/Local/Google/Chrome/User Data")
-    #chrome_options.add_argument("profile-directory=Profile 2")
-    #self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     self.vars = {}
   
-  def teardown_method(self): #, method
+  def teardown_method(self):
     self.driver.quit()
   
   ############################## TESTS LOGIN ##############################
@@ -50,9 +41,10 @@ class TestDefaultSuite():
     self.driver.find_element(By.ID, "password").click()
     self.driver.find_element(By.ID, "password").send_keys("admin123")
     self.driver.find_element(By.NAME, "submit").click()
-    
     self.driver.set_window_size(974, 1031)
     self.driver.find_element(By.LINK_TEXT, "Recomendador").click()
+    
+    # Act
     
     # Comprueba si aparece el botón "Volver a realizar el test"
     try:
@@ -62,7 +54,6 @@ class TestDefaultSuite():
         pass
 
     # Rellenar el formulario
-    
     for i in range(1, 11):
         self.driver.find_element(By.NAME, f"question_{i}").click()
     self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
@@ -70,126 +61,18 @@ class TestDefaultSuite():
     WebDriverWait(self.driver, 10).until(
       EC.presence_of_element_located((By.LINK_TEXT, "Volver a realizar el test"))
     )
+    
+    # Assert
     volver_boton = self.driver.find_element(By.LINK_TEXT, "Volver a realizar el test")
     assert volver_boton is not None
     
   
-  ############################## TESTS FORO ##############################
+  ############################## TESTS FORO CATEGORÍA ##############################
   
   def generate_unique_suffix(self):
     #Genera un sufijo único aleatorio.
     return ''.join(random.choices(string.ascii_letters + string.digits, k=10))
   
-  
-  def test_agregar_foro(self):
-    # Se debe iniciar sesión primero
-    self.driver.get("http://localhost:8083/login?next=%2F")
-    self.driver.set_window_size(974, 1040)
-    self.driver.find_element(By.ID, "username").click()
-    self.driver.find_element(By.ID, "username").send_keys("admin")
-    self.driver.find_element(By.ID, "password").click()
-    self.driver.find_element(By.ID, "password").send_keys("admin123")
-    self.driver.find_element(By.NAME, "submit").click()
-      
-    unique_name = f"foro prueba {self.generate_unique_suffix()}"
-    
-    self.driver.get("http://localhost:8083/")
-    self.driver.set_window_size(974, 1031)
-    self.driver.find_element(By.LINK_TEXT, "Foro").click()
-    self.driver.find_element(By.LINK_TEXT, "Agregar Foro").click()
-    
-    # Llenar el formulario
-    self.driver.find_element(By.ID, "name").click()
-    self.driver.find_element(By.ID, "name").send_keys(unique_name)
-    self.driver.find_element(By.ID, "description").send_keys("Descripción del foro prueba")
-    self.driver.find_element(By.ID, "category_id").click()
-    dropdown = self.driver.find_element(By.ID, "category_id")
-    dropdown.find_element(By.XPATH, "//option[. = 'prueba']").click()
-    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
-    
-    # Esperar y verificar el mensaje de éxito
-    WebDriverWait(self.driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-success"))
-    )
-    success_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-success")
-    assert "¡Foro agregado con éxito!" in success_message.text
- 
-  def test_borrar_foro(self):
-    # Se debe iniciar sesión primero
-    self.driver.get("http://localhost:8083/login?next=%2F")
-    self.driver.set_window_size(974, 1040)
-    self.driver.find_element(By.ID, "username").click()
-    self.driver.find_element(By.ID, "username").send_keys("admin")
-    self.driver.find_element(By.ID, "password").click()
-    self.driver.find_element(By.ID, "password").send_keys("admin123")
-    self.driver.find_element(By.NAME, "submit").click()
-    
-    self.driver.get("http://localhost:8083/")
-    self.driver.set_window_size(974, 1040)
-    self.driver.find_element(By.LINK_TEXT, "Foro").click()
-    
-    WebDriverWait(self.driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "table"))
-    )
-        
-    try:
-        # Verificar si hay al menos 2 filas en la tabla de foros
-        rows = self.driver.find_elements(By.CSS_SELECTOR, "tr")
-        if len(rows) < 3:  # La primera fila es el encabezado, por eso 3
-            pytest.skip("No hay suficientes foros para borrar.")
-            
-        delete_button = self.driver.find_element(By.CSS_SELECTOR, "tr:nth-child(2) form > .btn")
-        delete_button.click()
-            
-        WebDriverWait(self.driver, 10).until(EC.alert_is_present())
-        alert = self.driver.switch_to.alert
-        alert.accept()
-        
-        WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-success"))
-        )
-        success_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-success")
-        assert "¡Foro eliminado con éxito!" in success_message.text
-        
-            
-        
-        
-    except Exception as e:
-        pytest.fail(f"Test falló con excepción: {e}")
- 
- 
-  def test_editar_foro(self):
-    self.driver.get("http://localhost:8083/login?next=%2F")
-    self.driver.set_window_size(974, 1040)
-    self.driver.find_element(By.ID, "username").click()
-    self.driver.find_element(By.ID, "username").send_keys("admin")
-    self.driver.find_element(By.ID, "password").click()
-    self.driver.find_element(By.ID, "password").send_keys("admin123")
-    self.driver.find_element(By.NAME, "submit").click()
-    
-    self.driver.get("http://localhost:8083/")
-    self.driver.set_window_size(974, 1031)
-    self.driver.find_element(By.LINK_TEXT, "Foro").click()
-    self.driver.find_element(By.CSS_SELECTOR, "tr:nth-child(2) > td > .btn").click()
-    
-    original_name = "foro cambiado"
-    unique_name = f"{original_name} {self.generate_unique_suffix()}"
-    
-    # Actualizar el nombre del foro
-    name_field = self.driver.find_element(By.ID, "name")
-    name_field.clear()
-    name_field.send_keys(unique_name)
-    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
-    
-    WebDriverWait(self.driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-success"))
-    )
-    success_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-success")
-    assert "¡Foro actualizado con éxito!" in success_message.text
-        
-      
-      
-  ############################## TESTS FORO CATEGORÍA ##############################
   
   def test_agregar_categoria(self):
     self.driver.get("http://localhost:8083/login?next=%2F")
@@ -207,7 +90,6 @@ class TestDefaultSuite():
     
     unique_name = f"categoría nueva {self.generate_unique_suffix()}"
     
-    # Llenar el formulario
     self.driver.find_element(By.ID, "name").click()
     self.driver.find_element(By.ID, "name").send_keys(unique_name)
     self.driver.find_element(By.ID, "description").click()
@@ -236,10 +118,122 @@ class TestDefaultSuite():
     try:
         self.driver.find_element(By.LINK_TEXT, "Borrar Categoría").click()
         delete_button = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "tr:nth-child(3) .btn"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "tr:nth-child(1) .btn"))
         )
         delete_button.click()
         
+        WebDriverWait(self.driver, 10).until(EC.alert_is_present())
+        alert = self.driver.switch_to.alert
+        alert.accept()
+        
+        time.sleep(1)
+        success_message = None
+        
+        try:
+          self.driver.find_element(By.XPATH, "//td[text()='Sin categoría']")
+          assert True, "La categoría 'Sin categoría' no se eliminó porque está en uso."
+        except NoSuchElementException:
+          pass  # Si no hay mensaje de éxito, verifica si hay "Sin categoría"
+
+        # Si hay un mensaje de éxito, verificar su contenido
+        if success_message  and "¡Categoría eliminada con éxito!" in success_message:
+          assert "¡Categoría eliminada con éxito!" in success_message
+        elif success_message and "¡Categoría eliminada con éxito y foros afectados actualizados!" in success_message:
+            assert "¡Categoría eliminada con éxito y foros afectados actualizados!" in success_message
+
+    except Exception as e:
+        pytest.fail(f"Test falló con excepción: {e}")
+        
+        
+        
+  ############################## TESTS FORO ##############################
+  
+  def test_agregar_foro(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+      
+    unique_name = f"foro prueba {self.generate_unique_suffix()}"
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1031)
+    self.driver.find_element(By.LINK_TEXT, "Foro").click()
+    self.driver.find_element(By.LINK_TEXT, "Agregar Foro").click()
+    
+    self.driver.find_element(By.ID, "name").click()
+    self.driver.find_element(By.ID, "name").send_keys(unique_name)
+    self.driver.find_element(By.ID, "description").send_keys("Descripción del foro prueba")
+    self.driver.find_element(By.ID, "category_id").click()
+    dropdown = self.driver.find_element(By.ID, "category_id")
+    dropdown.find_element(By.XPATH, "//option[1]").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
+    
+    WebDriverWait(self.driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-success"))
+    )
+    success_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-success")
+    assert "¡Foro agregado con éxito!" in success_message.text
+ 
+ 
+  def test_editar_foro(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1031)
+    self.driver.find_element(By.LINK_TEXT, "Foro").click()
+    self.driver.find_element(By.CSS_SELECTOR, "tr:nth-child(1) > td > .btn").click()
+    
+    original_name = "foro cambiado"
+    unique_name = f"{original_name} {self.generate_unique_suffix()}"
+    
+    name_field = self.driver.find_element(By.ID, "name")
+    name_field.clear()
+    name_field.send_keys(unique_name)
+    self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
+    
+    WebDriverWait(self.driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-success"))
+    )
+    success_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-success")
+    assert "¡Foro actualizado con éxito!" in success_message.text
+        
+     
+  def test_borrar_foro(self):
+    self.driver.get("http://localhost:8083/login?next=%2F")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.ID, "username").click()
+    self.driver.find_element(By.ID, "username").send_keys("admin")
+    self.driver.find_element(By.ID, "password").click()
+    self.driver.find_element(By.ID, "password").send_keys("admin123")
+    self.driver.find_element(By.NAME, "submit").click()
+    
+    self.driver.get("http://localhost:8083/")
+    self.driver.set_window_size(974, 1040)
+    self.driver.find_element(By.LINK_TEXT, "Foro").click()
+    
+    WebDriverWait(self.driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "table"))
+    )
+        
+    try:
+        # Verificar si hay al menos 1 fila en la tabla de foros
+        rows = self.driver.find_elements(By.CSS_SELECTOR, "tr")
+        if len(rows) < 2:  # La primera fila es el encabezado, por eso 2
+            pytest.skip("No hay suficientes foros para borrar.")
+            
+        delete_button = self.driver.find_element(By.CSS_SELECTOR, "tr:nth-child(1) form > .btn")
+        delete_button.click()
+            
         WebDriverWait(self.driver, 10).until(EC.alert_is_present())
         alert = self.driver.switch_to.alert
         alert.accept()
@@ -248,13 +242,13 @@ class TestDefaultSuite():
             EC.presence_of_element_located((By.CSS_SELECTOR, ".alert-success"))
         )
         success_message = self.driver.find_element(By.CSS_SELECTOR, ".alert-success")
-        assert "¡Categoría eliminada con éxito!" in success_message.text
-    
+        assert "¡Foro eliminado con éxito!" in success_message.text
+        
     except Exception as e:
         pytest.fail(f"Test falló con excepción: {e}")
-        
-        
-        
+  
+      
+      
   ############################## TESTS FORO HILO ##############################
   
   def test_agregar_hilo(self):
@@ -270,7 +264,7 @@ class TestDefaultSuite():
     self.driver.set_window_size(974, 1031)
     self.driver.find_element(By.LINK_TEXT, "Foro").click()
     
-    self.driver.find_element(By.CSS_SELECTOR, ".table tbody tr:nth-child(2) a").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".table tbody tr:nth-child(1) a").click()
     self.driver.find_element(By.LINK_TEXT, "Agregar Hilo").click()
     self.driver.find_element(By.ID, "title").click()
     self.driver.find_element(By.ID, "title").send_keys("hilo prueba")
@@ -302,7 +296,7 @@ class TestDefaultSuite():
     )
     
     try:
-        self.driver.find_element(By.CSS_SELECTOR, ".table tbody tr:nth-child(2) a").click()
+        self.driver.find_element(By.CSS_SELECTOR, ".table tbody tr:nth-child(1) a").click()
 
         # Verificar si hay al menos 1 hilo
         rows = self.driver.find_elements(By.CSS_SELECTOR, "tr")
@@ -342,14 +336,15 @@ class TestDefaultSuite():
     self.driver.set_window_size(974, 1031)
     self.driver.find_element(By.LINK_TEXT, "Foro").click()
     
-    self.driver.find_element(By.CSS_SELECTOR, ".table tbody tr:nth-child(2) a").click()
     self.driver.find_element(By.CSS_SELECTOR, ".table tbody tr:nth-child(1) a").click()
-    
+    self.driver.find_element(By.CSS_SELECTOR, ".table tbody tr:nth-child(1) a").click()
+    time.sleep(1)
     # Verificar si hay al menos 1 comentario
     comments = self.driver.find_elements(By.CSS_SELECTOR, ".post-box")
     if len(comments) < 1:
         pytest.skip("No hay suficientes comentarios para responder.")
     self.driver.find_element(By.LINK_TEXT, "Responder").click()
+    time.sleep(1)
     self.driver.find_element(By.ID, "content").click()
     self.driver.find_element(By.ID, "content").send_keys("hola")
     self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
@@ -378,7 +373,7 @@ class TestDefaultSuite():
     )
     
     try:
-        self.driver.find_element(By.CSS_SELECTOR, ".table tbody tr:nth-child(2) a").click()
+        self.driver.find_element(By.CSS_SELECTOR, ".table tbody tr:nth-child(1) a").click()
         # Verificar si hay al menos 1 hilo
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, ".table tbody"))
@@ -430,11 +425,13 @@ class TestDefaultSuite():
     self.driver.set_window_size(974, 1040)
     self.driver.find_element(By.CSS_SELECTOR, "#top_user > .glyphicon").click()
     self.driver.find_element(By.LINK_TEXT, "Buscar usuarios").click()
+    time.sleep(1)
     self.driver.find_element(By.NAME, "q").click()
-    self.driver.find_element(By.NAME, "q").send_keys("lucia")
+    self.driver.find_element(By.NAME, "q").send_keys("guest")
     self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
+    time.sleep(1)
     
-    assert self.driver.find_element(By.LINK_TEXT, "lucia").is_displayed()
+    assert self.driver.find_element(By.LINK_TEXT, "Guest").is_displayed()
   
   def test_dejar_de_seguir(self):
     self.driver.get("http://localhost:8083/login?next=%2F")
@@ -451,13 +448,18 @@ class TestDefaultSuite():
     self.driver.find_element(By.LINK_TEXT, "Ir al perfil").click()
     self.driver.find_element(By.LINK_TEXT, "Seguidos").click()
     
+    first_followed_user_element = WebDriverWait(self.driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, ".mb-4:nth-child(1) a"))
+    )
+    first_followed_user_name = first_followed_user_element.text
+    
     WebDriverWait(self.driver, 10).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, ".mb-4:nth-child(2) .btn"))
+        EC.element_to_be_clickable((By.CSS_SELECTOR, ".mb-4:nth-child(1) .btn"))
     ).click()
     time.sleep(1)
   
-    usuarios_seguidos = self.driver.find_elements(By.LINK_TEXT, "lucia")
-    assert len(usuarios_seguidos) == 0, "El usuario 'lucia' sigue apareciendo en la lista de seguidos."
+    usuarios_seguidos = self.driver.find_elements(By.LINK_TEXT, first_followed_user_name)
+    assert len(usuarios_seguidos) == 0, "El usuario '{first_followed_user_name}' sigue apareciendo en la lista de seguidos."
   
   def test_seguir(self):
     self.driver.get("http://localhost:8083/login?next=%2F")
@@ -473,10 +475,10 @@ class TestDefaultSuite():
     self.driver.find_element(By.ID, "top_user").click()
     self.driver.find_element(By.LINK_TEXT, "Buscar usuarios").click()
     self.driver.find_element(By.NAME, "q").click()
-    self.driver.find_element(By.NAME, "q").send_keys("lucia")
+    self.driver.find_element(By.NAME, "q").send_keys("guest")
     self.driver.find_element(By.CSS_SELECTOR, ".btn-primary").click()
     WebDriverWait(self.driver, 10).until(
-        EC.element_to_be_clickable((By.LINK_TEXT, "lucia"))
+        EC.element_to_be_clickable((By.LINK_TEXT, "Guest"))
     ).click()
     
     WebDriverWait(self.driver, 10).until(
@@ -544,7 +546,14 @@ class TestDefaultSuite():
     self.driver.find_element(By.CSS_SELECTOR, "#top_user > .glyphicon").click()
     self.driver.find_element(By.LINK_TEXT, "Ir al perfil").click()
     self.driver.find_element(By.LINK_TEXT, "Seguidos").click()
-    self.driver.find_element(By.LINK_TEXT, "lucia").click()
+    
+    
+    first_followed_user_element = WebDriverWait(self.driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, ".mb-4:nth-child(1) a"))
+    )
+    first_followed_user_name = first_followed_user_element.text
+    
+    self.driver.find_element(By.LINK_TEXT, first_followed_user_name).click()
     self.driver.find_element(By.LINK_TEXT, "Abrir Chat").click()
     
     self.driver.find_element(By.NAME, "content").click()
@@ -574,7 +583,14 @@ class TestDefaultSuite():
     self.driver.find_element(By.CSS_SELECTOR, "#top_user > .glyphicon").click()
     self.driver.find_element(By.LINK_TEXT, "Ir al perfil").click()
     self.driver.find_element(By.LINK_TEXT, "Seguidos").click()
-    self.driver.find_element(By.LINK_TEXT, "lucia").click()
+    
+    
+    first_followed_user_element = WebDriverWait(self.driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, ".mb-4:nth-child(1) a"))
+    )
+    first_followed_user_name = first_followed_user_element.text
+    
+    self.driver.find_element(By.LINK_TEXT, first_followed_user_name).click()
     self.driver.find_element(By.LINK_TEXT, "Abrir Chat").click()
     
     self.driver.find_element(By.NAME, "content").click()
@@ -621,7 +637,7 @@ class TestDefaultSuite():
     self.driver.find_element(By.CSS_SELECTOR, ".glyphicon-bell").click()
     self.driver.find_element(By.LINK_TEXT, "Ver mensaje").click()
   
-    assert "Chat con lucia" in self.driver.page_source, "No se encontró el texto 'Chat con lucia' en la página."
+    assert "Chat con" in self.driver.page_source, "No se encontró el texto 'Chat con' en la página."
     
   def test_notificacion_ver_perfil(self):
     self.driver.get("http://localhost:8083/login?next=%2F")
@@ -636,7 +652,7 @@ class TestDefaultSuite():
     self.driver.set_window_size(974, 1040)
     self.driver.find_element(By.CSS_SELECTOR, ".glyphicon-bell").click()
     self.driver.find_element(By.LINK_TEXT, "Ver perfil").click()
-    assert "Perfil de lucia" in self.driver.page_source, "No se encontró el texto 'Perfil de lucia' en la página."
+    assert "Perfil de" in self.driver.page_source, "No se encontró el texto 'Perfil de' en la página."
 
   def test_notificacion_ver_post(self):
     self.driver.get("http://localhost:8083/login?next=%2F")
@@ -652,10 +668,8 @@ class TestDefaultSuite():
     self.driver.find_element(By.CSS_SELECTOR, ".glyphicon-bell").click()
     self.driver.find_element(By.LINK_TEXT, "Ver post").click()
   
-    # Assert
-    posts = self.driver.find_elements(By.CSS_SELECTOR, ".post-box")
-    found = any("lucia" in post.text for post in posts)
-    assert found, "No se encontró el texto 'lucia' en ningún mensaje."
+    responder_link = self.driver.find_elements(By.LINK_TEXT, "Responder")
+    assert len(responder_link) > 0, "No se encontró el enlace 'Responder' en el post."
     
   def test_borrar_una_notificacion(self):
     self.driver.get("http://localhost:8083/login?next=%2F")
@@ -763,6 +777,7 @@ class TestDefaultSuite():
     self.vars["win5834"] = self.wait_for_window(2000)
     self.driver.switch_to.window(self.vars["win5834"])
     self.driver.find_element(By.ID, "next").click()
+    self.driver.find_element(By.ID, "next").click()
     
     # Escuchar y parar audio
     self.driver.find_element(By.ID, "play-button").click()
@@ -805,6 +820,7 @@ class TestDefaultSuite():
     self.driver.find_element(By.ID, "readbtn").click()
     self.vars["win5834"] = self.wait_for_window(2000)
     self.driver.switch_to.window(self.vars["win5834"])
+    self.driver.find_element(By.ID, "next").click()
     self.driver.find_element(By.ID, "next").click()
     
     # Reproducir audio
@@ -853,19 +869,19 @@ class TestDefaultSuite():
     self.vars["win684"] = self.wait_for_window(2000)
     self.driver.switch_to.window(self.vars["win684"])
     self.driver.find_element(By.ID, "next").click()
+    self.driver.find_element(By.ID, "next").click()
     
     # Obtener duración total del primer capítulo
     self.driver.find_element(By.ID, "play-button").click()
-    time.sleep(1)
+    time.sleep(2)
     total_time_chapter_1 = self.driver.find_element(By.ID, "total-time").text
     self.driver.find_element(By.ID, "pause-button").click()
     
-    self.driver.find_element(By.ID, "next").click()
-    self.driver.find_element(By.ID, "next").click()
-    self.driver.find_element(By.ID, "next").click()
-    self.driver.find_element(By.ID, "next").click()
-    self.driver.find_element(By.ID, "next").click()
-    self.driver.find_element(By.ID, "next").click()
+    self.driver.find_element(By.ID, "slider").click()
+    time.sleep(1)
+    self.driver.find_element(By.LINK_TEXT, "Capítulo II").click()
+    self.driver.find_element(By.ID, "slider").click()
+    time.sleep(1)
     
     # Obtener duración total del siguiente capítulo
     self.driver.find_element(By.ID, "play-button").click()

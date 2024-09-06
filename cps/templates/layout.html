@@ -86,9 +86,7 @@
               {% endif %}
               {% if not current_user.is_anonymous and not simple%}
                 <li class="top_tasks"><a id="top_tasks" href="{{url_for('tasks.get_tasks_status')}}"><span class="glyphicon glyphicon-tasks"></span> <span class="hidden-sm">{{_('Tasks')}}</span></a></li>
-                <!-- NUEVO red social. Botón notificación -->
                 <li class="top_notifications"><a id="top_notifications" href="{{url_for('notifications')}}"><span class="glyphicon glyphicon-bell"></span> <span class="hidden-sm">{{_('Notificaciones')}}</span></a></li>
-                <!-- NUEVO red social. Botón notificación -->
               {% endif %}
               {% if current_user.role_admin() %}
                 <li><a id="top_admin" data-text="{{_('Settings')}}" href="{{url_for('admin.admin')}}"><span class="glyphicon glyphicon-dashboard"></span> <span class="hidden-sm">{{_('Admin')}}</span></a></li>

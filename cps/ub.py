@@ -222,7 +222,7 @@ class UserBase:
     def __repr__(self):
         return '<User %r>' % self.name
 
-#################################### NUEVO red social ####################################
+#################################### RED SOCIAL ####################################
 # Clase de seguimiento de usuarios
 class UserFollow(Base):
     __tablename__ = 'user_follows'
@@ -261,7 +261,7 @@ class Message(Base):
     
     def __repr__(self):
         return f"<Message from {self.sender.name} to {self.receiver.name} at {self.timestamp}>"
-#################################### NUEVO red social ####################################
+#################################### RED SOCIAL ####################################
     
 # Baseclass for Users in Calibre-Web, settings which are depending on certain users are stored here. It is derived from
 # User Base (all access methods are declared there)
@@ -288,13 +288,11 @@ class User(UserBase, Base):
     view_settings = Column(JSON, default={})
     kobo_only_shelves_sync = Column(Integer, default=0)
     
-    #################################### NUEVO relaciones ####################################
     answers = relationship('Answer', back_populates='user')
     threads = relationship('db.Thread', order_by='Thread.id', back_populates='user')
     posts = relationship('db.Post', order_by='Post.id', back_populates='user')
     following_associations = relationship('UserFollow', foreign_keys='UserFollow.follower_id', back_populates='follower', cascade='all, delete-orphan')
     follower_associations = relationship('UserFollow', foreign_keys='UserFollow.followed_id', back_populates='followed', cascade='all, delete-orphan')
-    #################################### NUEVO relaciones ####################################
     
     def follow(self, user):
         if not self.is_following(user):
@@ -309,15 +307,15 @@ class User(UserBase, Base):
 
     def is_following(self, user):
         return session.query(UserFollow).filter(UserFollow.follower_id==self.id, UserFollow.followed_id==user.id).count() > 0
-#################################### NUEVO red social ####################################
+
     
-############################## NUEVO foro ################################
+############################## FORO ################################
 class ForumCategory(Base):
     __tablename__ = 'forum_categories'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=True)
-    # Relación con forums
+    
     forums = relationship('Forum', order_by='Forum.id', back_populates='category')
 
 class Forum(Base):
@@ -327,7 +325,7 @@ class Forum(Base):
     description = Column(String, nullable=True)
     category_id = Column(Integer, ForeignKey('forum_categories.id'), nullable=False)
     category = relationship('ForumCategory', back_populates='forums')
-    # Relación con threads
+    
     threads = relationship('Thread', order_by='Thread.id', back_populates='forum')
 
 ForumCategory.forums = relationship('Forum', order_by=Forum.id, back_populates='category')
@@ -341,7 +339,7 @@ class Thread(Base):
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     forum = relationship('Forum', back_populates='threads')
     user = relationship('User', back_populates='threads')
-    # Relación con posts
+    
     posts = relationship('Post', order_by='Post.created_at', back_populates='thread', cascade='all, delete-orphan')
 
 Forum.threads = relationship('Thread', order_by=Thread.id, back_populates='forum')
@@ -360,9 +358,9 @@ class Post(Base):
 
 Thread.posts = relationship('Post', order_by=Post.id, back_populates='thread')
 User.posts = relationship('Post', order_by=Post.id, back_populates='user')
-############################## NUEVO foro ################################
+############################## FORO ################################
 
-#################################### NUEVO recomendador ####################################
+#################################### RECOMENDADOR ####################################
 class Answer(Base):
     __tablename__ = 'answers'
     
@@ -399,7 +397,7 @@ class Recommendation(Base):
 
 User.recommendations = relationship('Recommendation', back_populates='user')
 
-#################################### NUEVO recomendador ####################################
+#################################### RECOMENDADOR ####################################
 
 
 if oauth_support:

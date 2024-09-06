@@ -47,9 +47,7 @@ from flask import flash
 
 from . import logger, ub, isoLanguages
 from .pagination import Pagination
-#################################### NUEVO recomendador ####################################
 from .ub import User, Answer
-#################################### NUEVO recomendador ####################################
 
 
 from weakref import WeakSet
