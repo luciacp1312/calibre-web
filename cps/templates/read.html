@@ -198,7 +198,7 @@
         
         function updateProgress() {
             if (currentTime < totalTime) {
-                currentTime += 1;
+                currentTime += 0.1;
                 document.getElementById('current-time').textContent = formatTime(currentTime);
                 document.getElementById('progress-bar').value = (currentTime / totalTime) * 100;
             } else {
@@ -208,7 +208,7 @@
         
         function startProgress() {
             if (interval) clearInterval(interval); // Para asegurar que no haya otro intervalo
-            interval = setInterval(updateProgress, 1000);
+            interval = setInterval(updateProgress, 100);
         }
         
         function pauseProgress() {
@@ -230,7 +230,7 @@
         }
         
         function calculateTotalTime(text) {
-            const wordsPerMinute = 200;
+            const wordsPerMinute = 167;
             const wordCount = text.split(/\s+/).length;
             return Math.ceil((wordCount / wordsPerMinute) * 60);
         }
